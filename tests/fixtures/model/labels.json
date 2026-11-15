@@ -1,0 +1,33 @@
+{
+ "classes": [
+  {
+   "id": "red_bug",
+   "name": "Red test bug",
+   "pest": true
+  },
+  {
+   "id": "green_bug",
+   "name": "Green test bug",
+   "pest": false
+  },
+  {
+   "id": "blue_bug",
+   "name": "Blue <b>test</b> bug",
+   "pest": false
+  }
+ ],
+ "input_size": 8,
+ "mean": [
+  0.5,
+  0.5,
+  0.5
+ ],
+ "std": [
+  0.25,
+  0.25,
+  0.25
+ ],
+ "temperature": 1.0,
+ "abstain_below": 0.6,
+ "version": "fixture-1"
+}

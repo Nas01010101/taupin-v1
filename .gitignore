@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+build/
+.DS_Store
+Thumbs.db
+.env
+.env.*
+# model files copied into the served tree by `python -m taupin` (source of truth: model/)
+web/model/
+# frontend-craft working files
+.frontend-craft/
+# ML training images are downloaded by train/, never committed
+data/raw/
+data/images/
+*.ckpt
+*.pt
+*.pth

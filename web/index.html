@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taupin: soil insects on a Quebec parcel</title>
+<meta name="description" content="Identify a soil insect from a photo, see when to set bait traps from NASA POWER soil temperature, and read the wireworm and corn rootworm risk for three rotations.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#15160f">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-wkIUCUJPDZDnCpTEaHsG3Is67Qva9sI5aoU4Ek8Vzx4='; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="app.css">
+<script type="importmap">{"imports": {"three": "./vendor/three/three.module.js", "three/addons/controls/OrbitControls.js": "./vendor/three/OrbitControls.js"}}</script>
+<script type="module" src="js/app.js"></script>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="./"><svg viewBox="0 0 64 64" aria-hidden="true"><g fill="currentColor" stroke="currentColor" stroke-linecap="round">
+    <path d="M29 9 24 3M35 9l5-6M22 23l-6-3M42 23l6-3M22 37l-7 2M42 37l7 2M23 47l-6 5M41 47l6 5" fill="none" stroke-width="2.4"/>
+    <ellipse cx="32" cy="11.5" rx="5" ry="4" stroke="none"/>
+    <path d="M26 15c4-1.6 8-1.6 12 0 3 3 4 8 4 12l2.5 4.5h-25L22 27c0-4 1-9 4-12z" stroke="none"/>
+    <path d="M21 33.5h22c0 12-3 21.5-11 27.5-8-6-11-15.5-11-27.5z" stroke="none"/>
+  </g>
+  <path d="M32 34v25" class="seam" stroke-width="1.6"/></svg><h1>Taupin</h1></a>
+  <p class="tag">Photo of a soil insect, bait-trap date, rotation risk</p>
+  <p id="model-status" class="status" role="status" data-status="loading">Loading model…</p>
+  <button id="theme" type="button" class="ghost" aria-label="Switch between light and dark theme">Theme</button>
+</header>
+<p id="fatal" class="bad" hidden></p>
+<main class="grid">
+  <section class="field-col" aria-labelledby="h-field">
+    <h2 id="h-field" class="sr">The parcel</h2>
+    <div id="field" class="field"></div>
+    <div class="field-bar">
+      <p id="site" class="muted small"></p>
+      <label class="small"><input id="show-pocket" type="checkbox"> Show the low wet pocket</label>
+    </div>
+    <p class="muted small">Drag to turn. Click the ground to move the last pin. Height drawn 3 times; the cut edge marks 10 cm, the depth the trap date is read at.</p>
+  </section>
+
+  <div class="side">
+    <section id="identify" aria-labelledby="h-id">
+      <h2 id="h-id">Drop a photo of a soil insect</h2>
+      <p class="lede">The model runs on this device. When it is not sure, it says so.</p>
+      <label id="drop" class="drop">
+        <input id="file" type="file" accept="image/*" class="sr">
+        <span><strong>Drop a photo</strong> or choose a file. It stays on this device.</span>
+      </label>
+      <div id="result" aria-live="polite"></div>
+      <div id="evidence"></div>
+    </section>
+
+    <section id="sec-trap" aria-labelledby="h-trap">
+      <h2 id="h-trap">When to set bait traps</h2>
+      <p class="lede">The week the top 10 cm of soil reaches 12 °C. NASA POWER, mean of 1995-2025.</p>
+      <div id="trap"></div>
+    </section>
+
+    <section aria-labelledby="h-risk">
+      <h2 id="h-risk">Rotating out of corn lowers the risk by 2028</h2>
+      <p class="lede">Wireworm level per year for three rotations. Select a year for its reasons.</p>
+      <div class="zones" role="group" aria-label="Zone">
+        <button id="zone-upland" type="button" class="seg" aria-pressed="true">Upland</button>
+        <button id="zone-pocket" type="button" class="seg" aria-pressed="false">Low wet pocket</button>
+      </div>
+      <div id="risk-summary"></div>
+      <div class="table-wrap" id="risk-table"></div>
+      <div id="trace" aria-live="polite"></div>
+      <ul class="legend"><li><i class="sw-low"></i>Low</li><li><i class="sw-mod"></i>Moderate</li><li><i class="sw-high"></i>High</li><li>Rx: prescription supportable</li></ul>
+      <p class="rule">Since 1 August 2025 in Quebec, insecticide-treated seed (class 3A) needs an agronomist's prescription. Taupin documents the case; the agronomist signs. Code de gestion des pesticides, D. 470-2025.</p>
+    </section>
+  </div>
+</main>
+
+<section class="band" aria-labelledby="h-gal">
+  <h2 id="h-gal">What each insect looks like</h2>
+  <p class="muted">Select a photo to classify it.</p>
+  <div id="gallery"></div>
+</section>
+
+<section class="band about" aria-labelledby="h-about">
+  <h2 id="h-about">A stand-in field, not a farm</h2>
+  <p class="lede">What the numbers rest on, and where they stop.</p>
+  <div id="model-metrics" class="small"></div>
+  <ul>
+    <li>Bois-de-Liesse is a park used as a stand-in for a farm field. No insects were collected there.</li>
+    <li>A photo identification is triage, not a count. Levels change only with bait-trap counts, which the agronomist records.</li>
+    <li>NASA POWER soil temperature is a grid of about 50 km; a field can be a few days ahead or behind.</li>
+    <li>Not a NASA product. Uses NASA open data.</li>
+  </ul>
+  <h3>Field data</h3>
+  <ul id="field-src" class="src"></ul>
+</section>
+</body>
+</html>

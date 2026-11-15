@@ -1,0 +1,52 @@
+{
+ "items": [
+  {
+   "file": "gallery/wireworm_larva.jpg",
+   "class_id": "wireworm",
+   "caption": "Wireworm (Elateridae larva)",
+   "author": "ZATRIPPIT",
+   "licence": "CC0",
+   "source": "https://commons.wikimedia.org/wiki/File:Click_beetle_larvae.jpg"
+  },
+  {
+   "file": "gallery/click_beetle_adult.jpg",
+   "class_id": "click_beetle",
+   "caption": "Click beetle (Agriotes adult)",
+   "author": "gailhampshire",
+   "licence": "CC BY 2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Wireworm_Click_Beetle_-_Agriotes_obscurus_%3F_(51859491891).jpg"
+  },
+  {
+   "file": "gallery/wcr_adult.jpg",
+   "class_id": "corn_rootworm",
+   "caption": "Western corn rootworm adult",
+   "author": "unknown",
+   "licence": "Public domain",
+   "source": "https://commons.wikimedia.org/wiki/File:Western_corn_rootworm.jpg"
+  },
+  {
+   "file": "gallery/wcr_larvae.jpg",
+   "class_id": null,
+   "caption": "Corn rootworm larvae (not a model class)",
+   "author": "Scott Bauer, USDA Agricultural Research Service, United States",
+   "licence": "CC BY 3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Diabrotica_virgifera_virgifera_larvae.jpg"
+  },
+  {
+   "file": "gallery/ground_beetle.jpg",
+   "class_id": "ground_beetle",
+   "caption": "Ground beetle (Carabidae, beneficial)",
+   "author": "Alexandria 'Alex' Wenninger",
+   "licence": "CC BY 4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Pterostichus_melanarius_321269585.jpg"
+  },
+  {
+   "file": "gallery/white_grub.jpg",
+   "class_id": "white_grub",
+   "caption": "White grub (scarab larva)",
+   "author": "Michael Reding, USDA Agricultural Research Service, Bugwood.org",
+   "licence": "CC BY 3.0 us",
+   "source": "https://commons.wikimedia.org/wiki/File:Popillia_japonica_(28).jpg"
+  }
+ ]
+}
