@@ -1,0 +1,71 @@
+{
+ "kind": "logistic",
+ "version": "labrie2020-compact",
+ "provenance": "trained",
+ "target": "P(mean wireworms per bait trap >= 1.0) for a whole field",
+ "features": [
+  {
+   "name": "light_soil",
+   "layer": "soil layer: sand or sandy loam",
+   "transform": "0/1",
+   "mean": 0.31707,
+   "sd": 0.46534
+  },
+  {
+   "name": "forage_years",
+   "layer": "field form: years in forage before this crop",
+   "transform": "log1p",
+   "mean": 0.58826,
+   "sd": 0.82255
+  },
+  {
+   "name": "gwet_spring",
+   "layer": "NASA POWER GWETROOT, mean 1 Apr to 31 May",
+   "transform": "identity",
+   "mean": 0.732,
+   "sd": 0.07782
+  },
+  {
+   "name": "tsoil_winter_min_c",
+   "layer": "NASA POWER TSOIL1, minimum 1 Dec to 31 Mar",
+   "transform": "identity",
+   "mean": -14.57012,
+   "sd": 3.25631
+  }
+ ],
+ "intercept": -2.66151,
+ "coef": {
+  "light_soil": 0.60508,
+  "forage_years": -0.02525,
+  "gwet_spring": -0.55828,
+  "tsoil_winter_min_c": -1.01852
+ },
+ "metrics": {
+  "n": 82,
+  "positives": 11,
+  "features": [
+   "light_soil",
+   "forage_years",
+   "gwet_spring",
+   "tsoil_winter_min_c"
+  ],
+  "fitted": true,
+  "auc_leave_one_field_out": 0.8,
+  "auc_ci95": [
+   0.632,
+   0.927
+  ],
+  "auc_leave_one_year_out": 0.684,
+  "auc_leave_one_region_out": 0.647,
+  "auc_leave_one_power_cell_out": 0.769,
+  "permutation_p": 0.0033,
+  "brier": 0.1096,
+  "brier_base_rate": 0.1162,
+  "rank_corr_with_count": 0.443,
+  "rule_prior_auc": 0.569
+ },
+ "sources": [
+  "Labrie et al. 2020, PLoS ONE 15(2): e0229136, doi:10.1371/journal.pone.0229136 (S1 Table, Figs 1 and 3; CC BY 4.0)",
+  "NASA POWER daily point API, MERRA-2, 0.5 x 0.625 degree"
+ ]
+}

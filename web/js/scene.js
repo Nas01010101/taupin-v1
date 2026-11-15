@@ -1,16 +1,20 @@
-// Three.js scene for the parcel, ported from field-shift web/twin/scene.js: terrain from NASADEM
-// heights, the HLS true-colour texture, an optional overlay of the low wet pocket, a soil-profile
-// skirt, and photo pins (a stem plus the photo as a billboard). Machines and crop plants from the
-// original are left out; this tool is about what lives in the soil.
+// Three.js scene for the parcel: terrain from the 2 m lidar DTM, one draped layer at a time
+// (web/js/layers.js), tree crowns at the lidar treetops, a soil-profile skirt on the cut edge,
+// bait-trap flags, an optional overlay of the low wet pocket, and photo pins (a stem plus the
+// photo as a billboard). Machines and crop plants are left out; this tool is about the soil.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { VIEWS, decode, colorOf } from './layers.js';
 
-const TEX = 1024, EXAG = 3, PROFILE_DEPTH = 24;
+// Relief is drawn 2 times (12 m over 600 m would read flat); trees are drawn at their lidar height.
+const TEX = 1200, EXAG = 2, PROFILE_DEPTH = 24;
 
-export function createScene(container, field, textureUrl) {
+// base: URL prefix of field.json's layer files ('data/').
+export function createScene(container, field, base = 'data/') {
   const N = field.parcel.size, W = N * field.parcel.res_m;
-  const H = Float32Array.from(field.height), hmin = Math.min(...H);
-  const pocket = field.pocket;
+  const byKey = Object.fromEntries(field.layers.map(l => [l.key, l]));
+  const data = {};
+  let H = new Float32Array(N * N), hmin = 0, view = 'terrain', showPocket = false;
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(2, devicePixelRatio));
@@ -23,44 +27,53 @@ export function createScene(container, field, textureUrl) {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.maxPolarAngle = Math.PI * 0.46;
-  controls.minDistance = 150; controls.maxDistance = 2200;
-  scene.add(new THREE.HemisphereLight(0xf2f6ff, 0x3a3020, 1.15));
-  const sun = new THREE.DirectionalLight(0xfff2dc, 1.5);
-  sun.position.set(-300, 500, -200);
+  controls.minDistance = 40; controls.maxDistance = 2200;
+  scene.add(new THREE.HemisphereLight(0xf2f6ff, 0x3a3020, 1.3));
+  const sun = new THREE.DirectionalLight(0xfff2dc, 1.4);
+  sun.position.set(-300, 500, -300);            // from the north-west, like the baked hillshade
   scene.add(sun);
 
-  // ------------------------------------------------------------ terrain + ground texture
+  // ------------------------------------------------------------ terrain + draped layer
   const geo = new THREE.PlaneGeometry(W, W, N - 1, N - 1);
   geo.rotateX(-Math.PI / 2);
-  const pos = geo.attributes.position;
-  for (let i = 0; i < N * N; i++) pos.setY(i, (H[i] - hmin) * EXAG);
-  geo.computeVertexNormals();
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = TEX;
   const g2 = canvas.getContext('2d');
+  const small = document.createElement('canvas');
+  small.width = small.height = N;
+  const s2 = small.getContext('2d');
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
   const terrain = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ map: tex }));
   scene.add(terrain);
-  const sat = new Image();
-  const ready = new Promise(r => { sat.onload = r; sat.onerror = r; });
-  sat.src = textureUrl;
-  let showPocket = false;
   const px = TEX / (N - 1);
 
   function paint() {
-    // Pixel centres sit on the terrain vertices (cell centres), like the pocket overlay below.
-    g2.imageSmoothingEnabled = false;
-    if (sat.naturalWidth) g2.drawImage(sat, -px / 2, -px / 2, TEX + px, TEX + px);
-    else { g2.fillStyle = '#5a5140'; g2.fillRect(0, 0, TEX, TEX); }
-    if (showPocket) {
-      g2.fillStyle = 'rgba(64,150,220,0.55)';
-      for (let i = 0; i < N * N; i++) if (pocket[i]) g2.fillRect(((i % N) - 0.5) * px, (((i / N) | 0) - 0.5) * px, px + 1, px + 1);
+    const v = VIEWS.find(x => x.key === view), lay = byKey[v.layer], vals = data[v.layer];
+    const hs = data.hillshade, chm = data.canopy, n = lay.size, k = N / n;
+    const img = s2.createImageData(N, N);
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+      const i = r * N + c;
+      // 30 m layers: each 2 m cell takes its 30 m cell's value, so blocks stay visible.
+      const val = n === N ? vals[i] : vals[Math.floor(r / k) * n + Math.floor(c / k)];
+      let rgb = colorOf(lay, val) ?? [150, 146, 136];
+      if (view === 'terrain' && chm[i] >= 2) rgb = [70, 96, 58];           // shade under crowns
+      const s = 0.6 + 0.5 * hs[i];                 // flat ground (hs 0.71) at 0.95
+      const o = i * 4;
+      img.data[o] = rgb[0] * s; img.data[o + 1] = rgb[1] * s; img.data[o + 2] = rgb[2] * s; img.data[o + 3] = 255;
+      if (showPocket && H[i] <= field.pocket.height_max_m) {
+        img.data[o] = img.data[o] * 0.45 + 64 * 0.55; img.data[o + 1] = img.data[o + 1] * 0.45 + 150 * 0.55;
+        img.data[o + 2] = img.data[o + 2] * 0.45 + 220 * 0.55;
+      }
     }
+    s2.putImageData(img, 0, 0);
+    // Class and 30 m views stay blocky (nearest); 2 m views are smoothed between cell centres.
+    g2.imageSmoothingEnabled = lay.kind !== 'classes' && n === N;
+    g2.drawImage(small, -px / 2, -px / 2, TEX + px, TEX + px);   // pixel centres on the vertices
     tex.needsUpdate = true;
+    trees.visible = view === 'terrain' || view === 'soil' || view === 'zones';
   }
-  ready.then(paint);
 
   const heightAt = (row, col) => {
     const r = Math.max(0, Math.min(N - 1.001, row)), c = Math.max(0, Math.min(N - 1.001, col));
@@ -81,16 +94,17 @@ export function createScene(container, field, textureUrl) {
     x.fillStyle = '#e8d9a0'; x.fillRect(0, (0.1 / 1.2) * 256 - 1, 8, 2);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   })();
-  {
+  function skirt() {
     const verts = [], uv = [], idx = [];
     const edges = [[0, 0, 0, 1], [0, N - 1, 1, 0], [N - 1, N - 1, 0, -1], [N - 1, 0, -1, 0]];
     for (const [r0, c0, dr, dc] of edges) {
-      const base = verts.length / 3;
+      const b = verts.length / 3;
       for (let k = 0; k < N; k++) {
         const p = toWorld(r0 + dr * k, c0 + dc * k);
-        verts.push(p.x, p.y, p.z, p.x, -PROFILE_DEPTH, p.z);
-        uv.push(0, 1, 0, 1 - (p.y + PROFILE_DEPTH) / PROFILE_DEPTH);   // 1 unit = 5 cm; C horizon clamps below
-        if (k) { const a = base + (k - 1) * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+        // The profile hangs from the surface: 0 at the ground line, 1.2 m (24 units) below it.
+        verts.push(p.x, p.y, p.z, p.x, p.y - PROFILE_DEPTH, p.z);
+        uv.push(0, 1, 0, 0);
+        if (k) { const a = b + (k - 1) * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
       }
     }
     const g = new THREE.BufferGeometry();
@@ -98,6 +112,47 @@ export function createScene(container, field, textureUrl) {
     g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
     g.setIndex(idx); g.computeVertexNormals();
     scene.add(new THREE.Mesh(g, new THREE.MeshLambertMaterial({ map: profileTex, side: THREE.DoubleSide })));
+  }
+
+  // ------------------------------------------------------------ trees (lidar treetops)
+  const trees = new THREE.Group(); scene.add(trees);
+  function plantTrees() {
+    const list = field.trees, m = new THREE.Matrix4(), q = new THREE.Quaternion(), col = new THREE.Color();
+    const crowns = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1),
+      new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true }), list.length);
+    list.forEach(([row, col0, h], i) => {
+      // Crown shape is drawn, not measured: about 0.3 x height wide, the top 70 % of the tree.
+      const r = Math.max(1.5, 0.3 * h), p = toWorld(row, col0);
+      m.compose(new THREE.Vector3(p.x, p.y + h * 0.65, p.z), q, new THREE.Vector3(r, h * 0.35, r));
+      crowns.setMatrixAt(i, m);
+      crowns.setColorAt(i, col.setHSL(0.27 + (i % 7) * 0.008, 0.38, 0.2 + Math.min(h, 30) / 150));
+    });
+    trees.add(crowns);
+  }
+
+  // ------------------------------------------------------------ trap flags
+  const traps = new THREE.Group(); scene.add(traps);
+  const flagMat = new THREE.MeshLambertMaterial({ color: 0xf2efe6 });
+  function letterSprite(txt) {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const x = c.getContext('2d');
+    x.fillStyle = '#c8402c'; x.beginPath(); x.arc(32, 32, 28, 0, 7); x.fill();
+    x.fillStyle = '#fff'; x.font = '600 36px Inter, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText(txt, 32, 34);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false }));
+    s.renderOrder = 3; return s;
+  }
+  function placeTraps() {
+    for (const t of field.traps) {
+      const g = new THREE.Group();
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 18, 6), flagMat); pole.position.y = 9;
+      const tag = letterSprite(t.id); tag.position.y = 24; tag.scale.set(14, 14, 1);
+      g.add(pole, tag);
+      g.position.copy(toWorld(t.row, t.col));
+      g.userData.trap = t.id;
+      traps.add(g);
+    }
   }
 
   // ------------------------------------------------------------ pins
@@ -115,14 +170,17 @@ export function createScene(container, field, textureUrl) {
       sp.scale.set(70, 70, 1); sp.position.y = 110; sp.renderOrder = 2;
       g.add(sp);
     }
+    g.userData.cell = [row, col];
     g.userData.base = toWorld(row, col);
-    g.position.copy(g.userData.base);
+    g.userData.drop = drop;
     pins.add(g);
     setDrop(g, drop);
     return g;
   }
   function setDrop(g, k) {                       // k: 0 = above the view, 1 = planted
+    g.userData.drop = k;
     const e = 1 - (1 - Math.min(1, Math.max(0, k))) ** 3;
+    g.position.copy(g.userData.base);
     g.position.y = g.userData.base.y + (1 - e) * 400;
     g.visible = k > 0;
   }
@@ -139,6 +197,26 @@ export function createScene(container, field, textureUrl) {
     ray.setFromCamera(ndc, camera);
     const hit = ray.intersectObject(terrain)[0];
     if (hit) pickCb?.(Math.round((1 - hit.uv.y) * (N - 1)), Math.round(hit.uv.x * (N - 1)));
+  });
+
+  // ------------------------------------------------------------ load layers, build the mesh
+  const ready = Promise.all(field.layers.map(async l => {
+    const res = await fetch(base + l.file);
+    if (!res.ok) throw new Error(`${l.file}: ${res.status}`);
+    data[l.key] = decode(await res.arrayBuffer(), l.encoding);
+  })).then(() => {
+    H = data.height;
+    hmin = Infinity;
+    for (const h of H) if (h < hmin) hmin = h;      // no Math.min(...H): 90 000 arguments
+    const pos = geo.attributes.position;
+    for (let i = 0; i < N * N; i++) pos.setY(i, (H[i] - hmin) * EXAG);
+    pos.needsUpdate = true;
+    geo.computeVertexNormals();
+    geo.computeBoundingSphere();
+    skirt(); plantTrees(); placeTraps();
+    // Pins added before the heights arrived sit at 0; lift them onto the ground.
+    for (const g of pins.children) { g.userData.base = toWorld(...g.userData.cell); setDrop(g, g.userData.drop); }
+    paint();
   });
 
   // ------------------------------------------------------------ camera + loop
@@ -180,13 +258,19 @@ export function createScene(container, field, textureUrl) {
   });
   resize();
 
+  const cellOk = (row, col) => Math.max(0, Math.min(N - 1, row)) * N + Math.max(0, Math.min(N - 1, col));
   return {
     ready, addPin, setDrop, clearPins, setOrbit,
-    setPocket(on) { showPocket = on; paint(); },
+    setPocket(on) { showPocket = on; if (data.height) paint(); },
+    // key: one of VIEWS (terrain, twi, ndvi, lst, soil, zones).
+    setLayer(key) { view = key; if (data.height) paint(); },
+    get layer() { return view; },
+    setTraps(on) { traps.visible = on; },
     onPick(cb) { pickCb = cb; },
     render() { renderer.render(scene, camera); },
     setLooping(on) { looping = on; },
-    isPocket: (row, col) => !!pocket[Math.max(0, Math.min(N - 1, row)) * N + Math.max(0, Math.min(N - 1, col))],
+    // Low wet pocket: lowest 15 % of parcel cells by lidar height (field.pocket); false until ready.
+    isPocket: (row, col) => H[cellOk(row, col)] <= field.pocket.height_max_m && !!data.height,
     size: N,
     // The pitch deck sets controls.autoRotate on these; the render loop already calls controls.update().
     camera, controls,

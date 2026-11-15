@@ -23,3 +23,5 @@ data/images/
 *.ckpt
 *.pt
 *.pth
+# compete run ledger and logs
+.compete/

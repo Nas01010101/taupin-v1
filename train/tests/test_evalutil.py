@@ -13,7 +13,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from evalutil import (fit_temperature, headline, macro_f1, pick_threshold, preprocess, resize_crop,  # noqa: E402
                       softmax)
 from fetch_ood import ILLUSTRATION, commons_thumb, is_open  # noqa: E402
-from split import user_split  # noqa: E402
+from split import apply_audit, user_split  # noqa: E402
+from subset_ood_logits import subset_index  # noqa: E402
 
 
 def test_resize_crop_short_side_and_centre():
@@ -72,3 +73,20 @@ def test_commons_thumb_url():
     u = "https://upload.wikimedia.org/wikipedia/commons/0/01/Earthworm_cocoons.jpg?utm_source=commons"
     assert commons_thumb(u) == ("https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Earthworm_cocoons.jpg/"
                                 "960px-Earthworm_cocoons.jpg")
+
+
+def test_audit_drops_only_listed_ood_rows(tmp_path):
+    audit = tmp_path / "ood_audit.csv"
+    audit.write_text("photo_id,class,reason\nA,wireworm,plate\n")
+    rows = [{"photo_id": "A", "split": "ood"}, {"photo_id": "A", "split": "train"},
+            {"photo_id": "B", "split": "ood"}]
+    kept, n = apply_audit(rows, audit)
+    assert n == 1 and [r["split"] for r in kept] == ["train", "ood"]
+    assert apply_audit(rows, tmp_path / "missing.csv") == (rows, 0)
+
+
+def test_subset_index_keeps_order_and_rejects_reorder():
+    assert subset_index(["a", "b", "c", "d"], ["b", "d"]).tolist() == [1, 3]
+    import pytest
+    with pytest.raises(ValueError):
+        subset_index(["a", "b", "c"], ["c", "a"])

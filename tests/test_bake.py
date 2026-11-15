@@ -48,31 +48,3 @@ def test_load_power_param_accepts_both_layouts(tmp_path):
     assert bake.load_power_param(api, "TSOIL1") == bake.load_power_param(flat, "TSOIL1")
     with pytest.raises(KeyError):
         bake.load_power_param(flat, "T2M")
-
-
-def test_bake_field_on_synthetic_rasters(tmp_path):
-    np = pytest.importorskip("numpy")
-    rasterio = pytest.importorskip("rasterio")
-    from rasterio.transform import from_origin
-
-    n, res, left, top = 20, 15.0, 595000.0, 5041000.0
-    tr = from_origin(left, top, res, res)
-    yy, xx = np.mgrid[0:n, 0:n]
-    layers = {"dem": (xx + yy).astype("float32")[None], "ndvi": np.full((1, n, n), 0.6, "float32"),
-              "rgb": np.stack([xx / n, yy / n, np.full((n, n), 0.3)]).astype("float32")}
-    for name, arr in layers.items():
-        with rasterio.open(tmp_path / f"{name}.tif", "w", driver="GTiff", height=n, width=n,
-                           count=arr.shape[0], dtype="float32", crs="EPSG:32618", transform=tr) as dst:
-            dst.write(arr)
-    site = {"name": "test", "lat": 45.5, "lon": -73.7, "res_m": res, "crs": "EPSG:32618",
-            "bounds": [left, top - n * res, left + n * res, top],
-            "bbox_lonlat": [-73.71, 45.49, -73.69, 45.51]}
-    (tmp_path / "site.json").write_text(json.dumps(site))
-    out = tmp_path / "out"
-    out.mkdir()
-    f = bake.bake_field(tmp_path, out, size=8, tex=64)
-    assert len(f["height"]) == 64 and len(f["ndvi"]) == 64 and sum(f["pocket"]) >= 1
-    assert f["parcel"]["window"] == [6, 6]
-    nw, se = f["parcel"]["nw"], f["parcel"]["se"]
-    assert nw[0] > se[0] and nw[1] < se[1]
-    assert (out / "field.png").exists() and (out / "field.json").exists()

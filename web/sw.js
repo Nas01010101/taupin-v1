@@ -1,13 +1,15 @@
 // Offline copy of the app. Network first so a running server always wins, then the cache, so
 // the installed app opens with no network. Bump CACHE when vendor/ or the shell changes.
-const CACHE = 'taupin-v2';
+const CACHE = 'taupin-v5';
 const SHELL = [
   './', 'index.html', 'app.css', 'manifest.webmanifest',
-  'js/app.js', 'js/scene.js', 'js/model.js', 'js/classify.js', 'js/risk.js', 'js/ui.js', 'js/demo.js',
+  'js/app.js', 'js/scene.js', 'js/layers.js', 'js/model.js', 'js/classify.js', 'js/risk.js', 'js/fieldrisk.js', 'js/ui.js', 'js/scout.js', 'js/demo.js',
   'vendor/three/three.module.js', 'vendor/three/three.core.js', 'vendor/three/OrbitControls.js',
   'vendor/ort/ort.wasm.min.mjs', 'vendor/ort/ort-wasm-simd-threaded.mjs', 'vendor/ort/ort-wasm-simd-threaded.wasm',
-  'data/field.json', 'data/field.png', 'data/risk.json', 'data/soil.json', 'data/gallery.json',
+  'data/field.json', 'data/risk.json', 'data/soil.json', 'data/gallery.json', 'data/risk_model.json', 'data/field_risk.json',
   'vendor/fonts/instrument-serif-latin-400-normal.woff2', 'vendor/fonts/inter-latin-400-normal.woff2', 'vendor/fonts/inter-latin-600-normal.woff2',
+  'data/layers/height.bin', 'data/layers/canopy.bin', 'data/layers/hillshade.bin', 'data/layers/slope.bin',
+  'data/layers/twi.bin', 'data/layers/ndvi.bin', 'data/layers/lst.bin', 'data/layers/soil.bin', 'data/layers/zones.bin',
   'icons/icon.svg', 'icons/logo.svg', 'icons/favicon-32.png', 'icons/icon-192.png',
 ];
 // Optional files: cached when present (the model is not installed on every copy).

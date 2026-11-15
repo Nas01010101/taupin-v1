@@ -33,12 +33,30 @@
 <main class="grid">
   <section class="field-col" aria-labelledby="h-field">
     <h2 id="h-field" class="sr">The parcel</h2>
+    <div class="zones layers" id="layer" role="group" aria-label="Map layer"></div>
     <div id="field" class="field"></div>
     <div class="field-bar">
       <p id="site" class="muted small"></p>
       <label class="small"><input id="show-pocket" type="checkbox"> Show the low wet pocket</label>
     </div>
-    <p class="muted small">Drag to turn. Click the ground to move the last pin. Height drawn 3 times; the cut edge marks 10 cm, the depth the trap date is read at.</p>
+    <div id="legend" class="layer-legend small" aria-live="polite"></div>
+    <p class="muted small">Drag to turn. Click the ground to move the last pin. Height drawn 2 times, trees at their lidar height; the cut edge marks 10 cm, the depth the trap date is read at.</p>
+    <section id="sec-traps" aria-labelledby="h-traps">
+      <h3 id="h-traps">Where to set the bait traps</h3>
+      <div id="traps"></div>
+      <div class="files" id="files">
+        <span class="small muted">Trap points and counts:</span>
+        <button type="button" class="ghost" data-file="gpx">GPX for a phone or GPS</button>
+        <button type="button" class="ghost" data-file="csv">CSV</button>
+        <button type="button" class="ghost" data-file="geojson">GeoJSON</button>
+      </div>
+      <details class="more" id="record-box">
+        <summary>Scouting record for the agronomist</summary>
+        <pre id="record" tabindex="0"></pre>
+        <button type="button" class="ghost" data-file="record">Save the record as text</button>
+        <button type="button" class="ghost" id="record-copy">Copy</button>
+      </details>
+    </section>
   </section>
 
   <div class="side">
@@ -57,6 +75,17 @@
       <h2 id="h-trap">When to set bait traps</h2>
       <p class="lede">The week the top 10 cm of soil reaches 12 °C. NASA POWER, mean of 1995-2025.</p>
       <div id="trap"></div>
+    </section>
+
+    <section id="sec-rank" aria-labelledby="h-rank">
+      <h2 id="h-rank">Field wireworm ranking</h2>
+      <p class="lede">Risk ranking from a model fitted on 82 Quebec bait-trapped fields (Labrie et al. 2020) and NASA POWER soil moisture and soil temperature.</p>
+      <div class="rank-form">
+        <label class="small">Scouting year <select id="rank-year"></select></label>
+        <label class="small">Years in forage before this crop <input id="rank-forage" type="number" min="0" max="20" step="1" value="0" inputmode="numeric"></label>
+      </div>
+      <div id="rank" aria-live="polite"></div>
+      <p class="small">Field-level risk for the prescription: check <a href="https://cerom.qc.ca/vffqc/" rel="noopener" target="_blank">VFF QC</a> (CÉROM and MAPAQ), the tool agronomists use. This ranking orders the field against the training fields. It gives one rank for the whole field; the scouting zones on the map spread the traps and do not rank parts of the field.</p>
     </section>
 
     <section aria-labelledby="h-risk">

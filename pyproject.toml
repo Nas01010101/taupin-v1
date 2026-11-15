@@ -11,14 +11,17 @@ dependencies = []
 [project.optional-dependencies]
 # `taupin classify <photo>` on the command line
 classify = ["onnxruntime>=1.18", "numpy>=1.24", "pillow>=13"]
-# `python -m taupin.bake`: turns the GeoTIFFs into web/data/ (outputs are committed)
-bake = ["numpy>=1.24", "pillow>=13", "rasterio>=1.3"]
+# `python -m taupin.bake` and `python -m taupin.fetch_layers`: download the rasters and soil
+# polygons and turn them into web/data/ (outputs are committed)
+bake = ["numpy>=1.24", "pillow>=13", "rasterio>=1.3", "pystac-client>=0.7",
+        "planetary-computer>=1.0", "pyshp>=2.3"]
 
 [project.scripts]
 taupin = "taupin.__main__:main"
 
 [dependency-groups]
-dev = ["pytest>=8", "onnx>=1.16", "onnxruntime>=1.18", "numpy>=1.24", "pillow>=13", "rasterio>=1.3"]
+dev = ["pytest>=8", "onnx>=1.16", "onnxruntime>=1.18", "numpy>=1.24", "pillow>=13", "rasterio>=1.3",
+       "pyshp>=2.3"]
 
 [build-system]
 requires = ["hatchling"]

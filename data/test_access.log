@@ -1,3 +1,7 @@
 {"time": "2026-11-14T20:47:22", "who": "clip_baseline ViT-B-32", "seal": "434f837f77dcd42f"}
 {"time": "2026-11-14T20:48:40", "who": "final_eval v1-effb0", "seal": "434f837f77dcd42f"}
 {"time": "2026-11-14T20:51:07", "who": "final_eval v1-effb0", "seal": "434f837f77dcd42f"}
+{"time": "2026-11-14T21:23:15", "who": "clip_baseline ViT-L-14", "seal": "434f837f77dcd42f"}
+{"time": "2026-11-14T21:25:07", "who": "clip_baseline hf-hub:imageomics/bioclip", "seal": "434f837f77dcd42f"}
+{"time": "2026-11-14T21:30:28", "who": "final_eval v2-dinov2s", "seal": "434f837f77dcd42f"}
+{"time": "2026-11-14T21:44:31", "who": "final_eval v2-dinov2s", "seal": "434f837f77dcd42f"}

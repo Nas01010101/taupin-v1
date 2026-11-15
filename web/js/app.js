@@ -2,16 +2,55 @@
 // classifies dropped photos in the browser and redraws the risk panel from the evidence.
 import * as ort from '../vendor/ort/ort.wasm.min.mjs';
 import { createScene } from './scene.js';
+import { VIEWS } from './layers.js';
 import { loadModel, classifyPixels } from './model.js';
 import { effectFor, riskView, trapWindow } from './risk.js';
+import { fieldRanking } from './fieldrisk.js';
+import { formatAnswer } from './classify.js';
+import * as scout from './scout.js';
 import * as ui from './ui.js';
 
 const $ = s => document.querySelector(s);
 const getJSON = async p => { const r = await fetch(p); if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); };
 const PIN = { wireworm: 0xe3a93f, rootworm: 0xb3361f, beneficial: 0x4f9a5a, none: 0x8a8f8c, unscored: 0x8a8f8c, unclear: 0xf2f2f2 };
 
-const state = { zone: 'upland', sel: null, evidence: [], current: { kind: 'idle' }, model: { status: 'loading' } };
+const state = { zone: 'upland', sel: null, rankYear: null, forage: 0, evidence: [], current: { kind: 'idle' }, model: { status: 'loading' } };
 let D, scene;
+
+// The count sheet lives in this browser only (localStorage); nothing is sent anywhere.
+const SHEET_KEY = 'taupin-counts';
+function loadSheet() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(SHEET_KEY)) ?? {}; } catch { /* private window or bad JSON: start empty */ }
+  return { counts: saved.counts ?? {}, dates: saved.dates ?? [], genus: saved.genus in scout.THRESHOLDS ? saved.genus : null };
+}
+const sheet = loadSheet();
+const today = () => new Date().toLocaleDateString('en-CA');   // YYYY-MM-DD in local time
+
+function recordNow() {
+  const r = fieldRanking(D.model, D.fieldRisk, { year: state.rankYear, forageYears: state.forage, lightSoil: 0 });
+  return scout.recordText({ date: today(), field: D.field, window: trapWindow(D.soil), sheet,
+    rank: r && { text: ui.RANK_TEXT[r.rank], year: r.year, n: D.model.metrics.n },
+    photos: state.evidence.map(e => `${formatAnswer(e.decision)}, ${e.zoneLabel}`) });
+}
+
+function renderCounts() {
+  $('#count-result').innerHTML = ui.countResultHTML(scout.liftSummary(D.field.traps, sheet), D.field.trap_rules.min_traps);
+  $('#record').textContent = recordNow();
+}
+
+function saveFile(name, text, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+const FILES = {
+  gpx: () => ['taupin-traps.gpx', scout.trapsGPX(D.field), 'application/gpx+xml'],
+  csv: () => ['taupin-traps.csv', scout.trapsCSV(D.field, sheet), 'text/csv'],
+  geojson: () => ['taupin-traps.geojson', scout.trapsGeoJSON(D.field, sheet), 'application/geo+json'],
+  record: () => [`taupin-record-${today()}.txt`, recordNow(), 'text/plain'],
+};
 
 function zoneOf(cell) { return cell && scene.isPocket(cell.row, cell.col) ? 'pocket' : 'upland'; }
 
@@ -22,6 +61,17 @@ function renderModelStatus() {
   if (m.reason) el.title = m.reason;
   $('#model-metrics').innerHTML = m.status !== 'ready' ? ''
     : D?.metrics ? ui.metricsHTML(D.metrics) : 'No model/metrics.json next to the model, so no accuracy is shown.';
+}
+
+// The soil map units under this parcel (Dorval clay loam and muck) are neither sand
+// nor sandy loam, so the model's light-soil input is 0 everywhere here.
+const LIGHT_SOIL_NOTE = 'Soil map units in this parcel are clay loam and muck, so the sand or sandy loam input is no everywhere and the rank is the same across the parcel.';
+
+function renderRank() {
+  const r = fieldRanking(D.model, D.fieldRisk, { year: state.rankYear, forageYears: state.forage, lightSoil: 0 });
+  $('#h-rank').textContent = r ? `${ui.RANK_TEXT[r.rank]} wireworm ranking for ${r.year}` : 'Field wireworm ranking';
+  $('#rank').innerHTML = ui.fieldRankHTML(r, D.model, { lightSoilNote: LIGHT_SOIL_NOTE });
+  $('#record').textContent = recordNow();
 }
 
 function renderPanel() {
@@ -36,6 +86,7 @@ function renderPanel() {
   $('#trap').innerHTML = ui.trapHTML(tw, D.soil, state.evidence);
   $('#evidence').innerHTML = ui.evidenceHTML(state.evidence);
   $('#result').innerHTML = ui.resultHTML(state.current);
+  $('#record').textContent = recordNow();
   document.body.classList.toggle('has-ww', view.ww);
 }
 
@@ -121,8 +172,31 @@ function bind() {
     const b = e.target.closest('[data-remove]'); if (!b) return;
     state.evidence.splice(Number(b.dataset.remove), 1); rebuildPins(); renderPanel();
   });
+  $('#rank-year').addEventListener('change', e => { state.rankYear = e.target.value; renderRank(); });
+  $('#rank-forage').addEventListener('input', e => {
+    const v = Number(e.target.value);
+    state.forage = Number.isFinite(v) ? Math.min(20, Math.max(0, v)) : 0; renderRank();
+  });
   for (const z of ['upland', 'pocket']) $(`#zone-${z}`).addEventListener('click', () => { state.zone = z; renderPanel(); });
+  $('#sec-traps').addEventListener('input', e => {
+    const t = e.target;
+    if (t.dataset.trap) (sheet.counts[t.dataset.trap] ??= [])[Number(t.dataset.lift)] = t.value;
+    else if (t.dataset.date) sheet.dates[Number(t.dataset.date)] = t.value;
+    else if (t.id === 'count-genus') sheet.genus = t.value;
+    else return;
+    try { localStorage.setItem(SHEET_KEY, JSON.stringify(sheet)); } catch { /* storage blocked: the sheet still works for this visit */ }
+    renderCounts();
+  });
+  $('#sec-traps').addEventListener('click', e => {
+    const f = e.target.closest('[data-file]');
+    if (f) saveFile(...FILES[f.dataset.file]());
+  });
+  $('#record-copy').addEventListener('click', async e => {
+    try { await navigator.clipboard.writeText(recordNow()); e.target.textContent = 'Copied'; }
+    catch { getSelection().selectAllChildren($('#record')); }   // clipboard refused: leave the text selected
+  });
   $('#show-pocket').addEventListener('change', e => scene.setPocket(e.target.checked));
+  $('#layer').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b) showLayer(b.dataset.view); });
   scene.onPick((row, col) => {
     const last = state.evidence[state.evidence.length - 1];
     if (!last) return;
@@ -130,15 +204,35 @@ function bind() {
   });
 }
 
+// Drape one layer and show its legend; the terrain view lists the lidar height.
+function showLayer(key) {
+  const v = VIEWS.find(x => x.key === key);
+  scene.setLayer(key);
+  for (const b of document.querySelectorAll('#layer [data-view]')) b.setAttribute('aria-pressed', String(b.dataset.view === key));
+  $('#legend').innerHTML = ui.layerLegendHTML(D.field.layers.find(l => l.key === v.layer));
+}
+
 async function main() {
-  const [field, risk, soil, gallery] = await Promise.all(['data/field.json', 'data/risk.json', 'data/soil.json', 'data/gallery.json'].map(getJSON));
-  D = { field, risk, soil, gallery: gallery.items, metrics: null };
-  scene = createScene($('#field'), field, `data/${field.texture}`);
-  $('#site').textContent = `${field.site.name}, ${field.parcel.area_ha} ha parcel at ${field.site.lat} N, ${Math.abs(field.site.lon)} W`;
+  const [field, risk, soil, gallery, model, fieldRisk] = await Promise.all(['data/field.json', 'data/risk.json', 'data/soil.json',
+    'data/gallery.json', 'data/risk_model.json', 'data/field_risk.json'].map(getJSON));
+  D = { field, risk, soil, gallery: gallery.items, metrics: null, model, fieldRisk };
+  const years = Object.keys(fieldRisk.per_year).sort();
+  state.rankYear = years[years.length - 1];
+  $('#rank-year').innerHTML = years.map(y => `<option${y === state.rankYear ? ' selected' : ''}>${ui.esc(y)}</option>`).join('');
+  scene = createScene($('#field'), field, 'data/');
+  $('#layer').innerHTML = VIEWS.map(v => `<button type="button" class="seg" data-view="${ui.esc(v.key)}" aria-pressed="${v.key === 'terrain'}">${ui.esc(v.label)}</button>`).join('');
+  showLayer('terrain');
+  sheet.genus ??= risk.zones.upland.dominant_genus;
+  $('#traps').innerHTML = ui.trapsHTML(field, sheet);
+  const side = field.parcel.size * field.parcel.res_m;
+  $('#site').textContent = `${field.site.name}: a ${side} m square at ${field.site.lat} N, ${Math.abs(field.site.lon)} W`
+    + (field.open ? `, with ${field.open.area_ha} ha of open ground where traps can go` : '');
   $('#field-src').innerHTML = Object.values(field.sources).map(s => `<li>${ui.esc(s)}</li>`).join('');
   $('#gallery').innerHTML = ui.galleryHTML(D.gallery, null);
   bind();
   renderPanel();
+  renderRank();
+  renderCounts();
   renderModelStatus();
   // Absolute: ort resolves wasmPaths against its own module URL, not the page.
   state.model = await loadModel({ ort, wasmPaths: new URL('vendor/ort/', document.baseURI).href });

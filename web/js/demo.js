@@ -8,13 +8,14 @@
 export const LENGTH = 12;
 const T = { photoIn: 1.5, photoOut: 2.5, classify: 2.5, answer: 3.5, pocket: 4, pinIn: 4.5, pinDown: 5.5, panel: 6, trace: 7.5 };
 
-function nearestPocketCell(field) {
-  const N = field.parcel.size, c = (N - 1) / 2;
+// Pocket cell nearest the parcel centre, from the scene's lidar heights (call after scene.ready).
+function nearestPocketCell(scene) {
+  const N = scene.size, c = (N - 1) / 2;
   let best = null, bd = Infinity;
-  field.pocket.forEach((p, i) => {
-    const r = (i / N) | 0, k = i % N, d = (r - c) ** 2 + (k - c) ** 2;
-    if (p && d < bd) { bd = d; best = { row: r, col: k }; }
-  });
+  for (let r = 0; r < N; r++) for (let k = 0; k < N; k++) {
+    const d = (r - c) ** 2 + (k - c) ** 2;
+    if (d < bd && scene.isPocket(r, k)) { bd = d; best = { row: r, col: k }; }
+  }
   return best ?? { row: c | 0, col: c | 0 };
 }
 
@@ -22,12 +23,12 @@ export async function runDemo({ scene, state, D, ingest, renderPanel }) {
   document.body.classList.add('demo');
   const params = new URLSearchParams(location.search);
   const sample = D.gallery.find(g => g.class_id === 'wireworm') ?? D.gallery.find(g => g.class_id) ?? D.gallery[0];
-  const cell = nearestPocketCell(D.field);
   const photo = document.createElement('img');
   photo.id = 'demo-photo'; photo.alt = ''; photo.src = sample?.file ?? '';
   document.querySelector('#field').appendChild(photo);
 
   await scene.ready;
+  const cell = nearestPocketCell(scene);
   // Run the real classification once, then rewind; seek() replays the stored answer.
   let entry = null;
   if (sample && state.model.status === 'ready') entry = await ingest(await (await fetch(sample.file)).blob(), sample.caption, cell, { dropMs: 0 });

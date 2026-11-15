@@ -53,10 +53,19 @@ def main():
     L.append(f"- ONNX vs PyTorch on all val, test and OOD images: max abs logit difference "
              f"{m['onnx']['max_abs_logit_diff_vs_torch']:.2e}, top-1 agreement {pct(m['onnx']['top1_agreement_vs_torch'])} "
              f"(onnxruntime {m['onnx']['ort_version']}, CPU).")
+    if m["onnx"].get("quantized_int8_matmul"):
+        L.append(f"- The line above compares the float32 export. The shipped file has int8 MatMul weights "
+                 f"(onnxruntime dynamic quantization, to fit 25 MB): against float32 ONNX, max abs logit difference "
+                 f"{m['onnx']['max_abs_logit_diff_int8_vs_fp32']:.2f}, top-1 agreement "
+                 f"{pct(m['onnx']['top1_agreement_int8_vs_fp32'])} (lowest split). All metrics below are from the "
+                 "shipped int8 file.")
     bc = m.get("browser_check")
     if bc:
-        L.append(f"- onnxruntime-web {bc['ort_web']} ({bc['backend']} backend, run in Node) on the two reference "
-                 f"inputs: max abs logit difference {bc['max_abs_diff']:.2e} against onnxruntime CPU.")
+        n = bc.get("n_samples", 2)
+        extra = (f", max probability difference {bc['max_prob_diff']:.3f}, top-1 agreement {pct(bc['top1_agreement'])}"
+                 if "max_prob_diff" in bc else "")
+        L.append(f"- onnxruntime-web {bc['ort_web']} ({bc['backend']} backend, run in Node) on {n} sample images: "
+                 f"max abs logit difference {bc['max_abs_diff']:.2e} against onnxruntime CPU{extra}.")
     L.append(f"- Weights: {WEIGHTS.get(m['arch'], m['arch'])}")
     if m.get("test_reads") is not None:
         L.append(f"- The sealed test split was read {m['test_reads']} times (`data/test_access.log`); no "
@@ -85,17 +94,21 @@ def main():
         L.append(row(f"Taupin, {title}", m["model"][s]))
         for name, b in m["clip_zero_shot"].items():
             L.append(row(f"CLIP zero-shot {name}, {title}", b[s]))
+        if s == "ood" and m.get("previous_version_ood"):  # earlier model, same OOD rows, its own T and threshold
+            pv = m["previous_version_ood"]
+            L.append(row(f"Taupin {pv['version']} (previous), OOD", pv["ood"]))
     for k, title in [("specimen", "OOD, museum or lab specimens"), ("field_or_other", "OOD, field and other photos")]:
         if len(m["model"].get("ood_subsets", {})) == 2:  # one subset alone repeats the OOD row
             L.append(row(f"Taupin, {title}", m["model"]["ood_subsets"][k]))
             for name, b in m["clip_zero_shot"].items():
                 if k in b.get("ood_subsets", {}):
                     L.append(row(f"CLIP zero-shot {name}, {title}", b["ood_subsets"][k]))
-    if m["model"].get("threshold_sweep"):
+    sweep = m.get("threshold_sweep") or m["model"].get("threshold_sweep")  # final_eval writes it top level
+    if sweep:
         L.append("\nAbstain threshold by validation accuracy target (only the shipped target is in labels.json; "
                  "coverage / accuracy when answering):\n")
         L.append("| target | threshold | val | test | OOD |\n|---|---|---|---|---|")
-        for tg, v in m["model"]["threshold_sweep"].items():
+        for tg, v in sweep.items():
             cell = lambda h: f"{pct(h['coverage_at_threshold'])} / {pct(h['accuracy_at_threshold'])}"
             L.append(f"| {pct(float(tg))} | {v['abstain_below']:.3f} | {cell(v['val'])} | {cell(v['test'])} | "
                      f"{cell(v['ood'])} |")

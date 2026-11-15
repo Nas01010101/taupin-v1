@@ -84,8 +84,11 @@ def main():
         np.concatenate(dumped).astype(np.float32).tofile(a.dump_inputs)
     json.dump({"classes": classes, "temperature": lab["temperature"], "input_size": lab["input_size"],
                "mean": lab["mean"], "std": lab["std"], "version": lab["version"],
-               "tolerance_note": ("identical input tensors give logits within about 1e-4; a different resize "
-                                  "or crop in the browser shows up as differences well above 1e-2"),
+               "tolerance_note": ("check the input first: input_first_pixel_rgb and input_mean_per_channel "
+                                  "should match to about 1e-3, else the resize or crop differs. The int8 model's "
+                                  "MatMulInteger kernels differ between onnxruntime CPU and wasm: logits within "
+                                  "0.27 and probabilities within 0.045 on the 24 samples, same top-1 (float32 "
+                                  "builds agree to about 1e-4)"),
                "samples": ref}, open(a.model / "reference_outputs.json", "w"), indent=1)
     keep = [r for r in rows if r["split"] != "sample"]
     with attr.open("w", newline="") as f:

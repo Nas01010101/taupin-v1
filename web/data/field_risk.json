@@ -1,0 +1,78 @@
+{
+ "site": {
+  "lat": 45.5056,
+  "lon": -73.7639
+ },
+ "power_cell": [
+  -73.764,
+  45.506,
+  37.97
+ ],
+ "power_url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=TSOIL1,GWETROOT,PRECTOTCORR,T2M&community=AG&longitude=-73.7639&latitude=45.5056&start=YYYY1201&end=YYYY0531&format=JSON",
+ "per_year": {
+  "2016": {
+   "gwet_spring": 0.89,
+   "tsoil_winter_min_c": -16.98
+  },
+  "2017": {
+   "gwet_spring": 0.942,
+   "tsoil_winter_min_c": -14.5
+  },
+  "2018": {
+   "gwet_spring": 0.892,
+   "tsoil_winter_min_c": -11.27
+  },
+  "2019": {
+   "gwet_spring": 0.943,
+   "tsoil_winter_min_c": -10.92
+  },
+  "2020": {
+   "gwet_spring": 0.871,
+   "tsoil_winter_min_c": -12.56
+  },
+  "2021": {
+   "gwet_spring": 0.76,
+   "tsoil_winter_min_c": -10.07
+  },
+  "2022": {
+   "gwet_spring": 0.858,
+   "tsoil_winter_min_c": -12.64
+  },
+  "2023": {
+   "gwet_spring": 0.853,
+   "tsoil_winter_min_c": -10.96
+  },
+  "2024": {
+   "gwet_spring": 0.834,
+   "tsoil_winter_min_c": -8.28
+  },
+  "2025": {
+   "gwet_spring": 0.806,
+   "tsoil_winter_min_c": -10.95
+  },
+  "2026": {
+   "gwet_spring": 0.84,
+   "tsoil_winter_min_c": -15.19
+  }
+ },
+ "rank_cutpoints": [
+  -3.1186,
+  -2.0512
+ ],
+ "rank_basis": "thirds of the model score over its 82 training fields",
+ "training_range": {
+  "forage_years": [
+   0.0,
+   20.0
+  ],
+  "gwet_spring": [
+   0.549,
+   0.907
+  ],
+  "tsoil_winter_min_c": [
+   -20.11,
+   -6.86
+  ]
+ },
+ "source": "NASA POWER daily point API, community AG (MERRA-2, 0.5 x 0.625 degree)"
+}

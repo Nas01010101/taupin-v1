@@ -15,8 +15,24 @@
   are kept: an open licence on a GBIF occurrence record does not license its image, so BugGuide
   and naturgucker images (no open image licence) and CC-BY-SA images are excluded. Drawings and
   plates from Commons are dropped by filename. The OOD set mixes specimen photos taken in a lab
-  with field photos, so it is harder than phone photos from one region and easier than nothing.
-  It was never used for training, model selection, temperature or threshold.
+  with field photos. It was never used for training, model selection, temperature or threshold.
+- OOD audit: all 648 OOD images were looked at on contact sheets, without model predictions, and
+  157 were removed (`data/ood_audit.csv`, one reason per image): 59 images in the wireworm folder
+  from Commons species categories (*Agriotes lineatus*, *A. obscurus*, *A. sputator*) that show
+  adult click beetles, not larvae; 29 slide, index-card and label-only photos; 48 plates,
+  drawings, collages and SEM images that the filename filter missed; and 21 photos with no
+  recognisable animal (cocoons, shells, microscope close-ups, empty bins), the wrong life stage
+  or several species in frame. The audit was prompted by a first OOD evaluation with low wireworm scores; the
+  per-image decisions did not look at predictions. On the 157 removed images every model scores
+  low: this model 41 correct (26%), BioCLIP 45 (29%), CLIP ViT-L-14 36 (23%), CLIP ViT-B-32 24
+  (15%). Before the audit (648 images) this model scored 76.5% accuracy, 76.3% macro-F1 and ECE
+  0.151 on OOD; BioCLIP scored 65.0%.
+- Wireworm OOD has 19 images after the audit (GBIF larvae only); its per-class numbers have wide
+  uncertainty.
+- Cross-source duplicates: no OOD image is within 6 bits (difference hash) of an iNaturalist
+  image. The 31 OOD images within 8 bits of their nearest iNaturalist image were checked by eye:
+  none is the same photo or the same animal. The same specimen photographed twice, once for each
+  portal, would not be caught.
 - Every image has a row in `data/attribution.csv` (url, author, licence, source, source id,
   class, split). Images are not in the repository; `train/fetch_inat.py` and `train/fetch_ood.py`
   download them.
@@ -36,7 +52,8 @@
 
 - Code: MIT (this repository); timm and open_clip are Apache-2.0 and MIT.
 - Backbone weights: see "Model" above.
-- Baseline weights: LAION open_clip checkpoints, MIT on their Hugging Face cards.
+- Baseline weights: LAION open_clip checkpoints (MIT on their Hugging Face cards) and BioCLIP
+  (`imageomics/bioclip`, MIT).
 - Images: CC0, CC-BY or public domain only, per image, with attribution in `data/attribution.csv`.
 
 ## Preprocessing (the browser must match this)
@@ -61,6 +78,26 @@ this.
 
 ## Known failure cases
 
+- Photos outside the classes get confident answers. Of the 157 OOD images removed by the audit
+  (drawings, label-only photos, adult beetles filed as wireworms, no animal in frame), the model
+  answered 92 at the shipped threshold instead of sending them to the lab (146 at the 95% target;
+  `abstain_check` in `metrics.json`). The abstain path catches uncertain photos of the eight
+  classes, not inputs that are not soil-animal photos.
+- Abstain target: the shipped threshold is the 98% validation target, not the 95% one in the
+  threshold table. The choice was made after both had been scored on test and OOD, as a product
+  choice: a wrong name costs the farmer more than a lab request, and at the 95% target the model
+  answered almost every photo, so the lab route did not fire. It was not tuned on those sets, but
+  it was not fixed in advance either (`train/set_target.py`). The intervals for coverage and
+  accuracy of answered photos are not reported for this threshold.
+- Museum and lab specimens (pinned, in alcohol, on a scale bar) score lower than field photos;
+  see the OOD rows by photo type.
+- int8 weights: the shipped file stores MatMul weights as int8 (dynamic quantization) to fit the
+  25 MB budget. Its top-1 agreement with the float model (in "Model") is measured on all val,
+  test and OOD images; a photo near the boundary between two classes can flip. The int8 kernels
+  also differ between processors: the same file on an Apple-silicon Mac (onnxruntime 1.32.0, CPU)
+  answers 457 of the 491 OOD photos correctly against 455 on the x86 evaluation machine, with the
+  same coverage.
+
 - Lab and macro specimen photos versus phone photos in the field: much of the training data is
   close-up and centred; a phone photo of soil with a small animal in it is not.
 - Small objects in frame: the centre crop keeps the middle square only, and an animal that fills
@@ -79,5 +116,6 @@ this.
 
 Triage for a farmer scouting a field: name the likely animal, flag the pest classes, and send
 uncertain photos to a lab. Not for treatment decisions without confirmation. The abstain
-threshold was set for a stated accuracy on validation; on OOD photos the accuracy when answering
-is lower, as the table shows.
+threshold was set for a stated accuracy on validation; the results table gives the accuracy when
+answering on the test and OOD sets, and the threshold table gives a stricter setting. A deployment
+should check a few hundred of its own field photos before trusting either number.

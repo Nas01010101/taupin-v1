@@ -7,6 +7,9 @@
   order), so duplicates never cross splits. OOD rows near any iNaturalist image are dropped.
 - The test manifest hash goes to data/test_seal.txt; train.py refuses to read test rows unless
   told this is the final evaluation, and every such read is appended to data/test_access.log.
+- data/ood_audit.csv lists OOD rows removed after a visual check (label-only photos, plates,
+  drawings, wrong life stage). It is applied after dedupe so it removes exactly the rows that
+  were looked at, and it only ever touches OOD rows.
 
     uv run --no-project --with pillow python train/split.py --root ~/scratch/taupin-data --out data
 """
@@ -41,6 +44,15 @@ def dhash(path):
 def user_split(uid):
     h = int(hashlib.sha256(("taupin-v1" + uid).encode()).hexdigest(), 16) % 100
     return "train" if h < 70 else ("val" if h < 85 else "test")
+
+
+def apply_audit(rows, audit_path):
+    """Drop OOD rows whose photo_id is listed in the audit file; return (kept, n_dropped)."""
+    if not audit_path.exists():
+        return rows, 0
+    ban = {r["photo_id"] for r in csv.DictReader(audit_path.open())}
+    kept = [r for r in rows if not (r["split"] == "ood" and r["photo_id"] in ban)]
+    return kept, len(rows) - len(kept)
 
 
 def main():
@@ -79,6 +91,7 @@ def main():
             continue
         bank.append((h, r["split"]))
         kept.append(r)
+    kept, dropped["excluded_audit"] = apply_audit(kept, a.out / "ood_audit.csv")
     a.out.mkdir(parents=True, exist_ok=True)
     with (a.out / "attribution.csv").open("w", newline="") as f:
         w = csv.DictWriter(f, ATTR_FIELDS, extrasaction="ignore")

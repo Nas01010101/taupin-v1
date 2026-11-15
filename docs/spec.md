@@ -8,7 +8,7 @@ Data"). Deadline: Sunday 2026-11-15 23:59 local. Repo: `~/Projects/taupin`, MIT.
 
 1. Opens the app (static web page; also runs offline and installs as an app).
 2. Sees a 3D model of the field: Parc-nature du Bois-de-Liesse, Secteur des Champs
-   (45.5056 N, -73.7639 W), a protected meadow used as a stand-in for St. Lawrence Lowland
+   (a 600 m square centred on 45.5013 N, 73.7651 W), a protected meadow used as a stand-in for St. Lawrence Lowland
    farmland returning to crops. Nothing is dug or collected there.
 3. Drops a photo of an insect found in the soil. A model running in the browser names it
    (or says "unclear: send to the lab") and the photo is pinned on the field.
@@ -23,6 +23,8 @@ Data"). Deadline: Sunday 2026-11-15 23:59 local. Repo: `~/Projects/taupin`, MIT.
 - `~/Projects/field-shift`: `web/twin/scene.js` (Three.js terrain scene), `web/twin/photo.js`
   (photo pins), `src/fieldshift/twin.py` (`bake`), and the fetched park data in `data/park/`
   (`dem.tif` NASADEM, `rgb.tif` + `ndvi.tif` from HLS, `power_daily.json`, `site.json`).
+  Superseded on 2026-11-14: the field layers now come from `src/taupin/layers.py` (HRDEM lidar, HLS,
+  Landsat, IRDA soil map); see `DATA_SOURCES.md`.
   The park is not corn, so place the parcel at the site centre instead of `pick_parcel`.
 
 ## Ownership (two agents work at once; stay in your lane)

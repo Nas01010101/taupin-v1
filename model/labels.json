@@ -52,7 +52,7 @@
   0.224,
   0.225
  ],
- "temperature": 0.6900157637413609,
- "abstain_below": 0.738004207611084,
- "version": "v1-effb0"
+ "temperature": 0.6951426783992118,
+ "abstain_below": 0.8922120332717896,
+ "version": "v2-dinov2s"
 }

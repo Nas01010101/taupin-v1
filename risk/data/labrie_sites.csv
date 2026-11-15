@@ -1,0 +1,85 @@
+crop,site,year,area,city,chu,lat,lon,texture,om_pct,tillage,previous_crop,forage_years,fertilization
+Corn,101,2012,Montérégie Ouest,St-Isidore,2850,45.31051,-73.65292,Clay loam,4.9,Conventional,Grassland,5,Mineral
+Corn,102,2012,Montérégie Est,St-Mathieu-de-Beloeil,2850,45.58700,-73.25405,Clay,4.0,No-Till,Soybean,0,Mineral
+Corn,103,2012,Montérégie Est,St-Dominique,2850,45.53415,-72.81212,Clay loam,3.3,Reduced tillage,Soybean,0,Organic
+Corn,104,2012,Montérégie Ouest,St-Édouard-de-Napierville,2850,45.20512,-73.52150,Sandy loam,4.5,Conventional,Grassland,> 1,Mineral
+Corn,105,2012,Montérégie Est,St-Louis-de-Gonzague,2850,45.21506,-73.99296,Sandy loam,2.3,Conventional,Grassland,4,Organic
+Corn,106,2012,Montérégie Ouest,St-Constant,2850,45.32205,-73.58874,Loam,5.8,Conventional,Grassland,1,Mineral
+Corn,107,2012,Montérégie Est,St- Mathias-sur-Richelieu,2850,45.48903,-73.19601,Loam,3.3,Conventional,Grassland,4,Mineral
+Corn,108,2012,Montérégie Est,Stanbridge East,2850,45.12088,-72.90885,Loam,NA,No-Till,Grassland,> 1,NA
+Corn,109,2012,Montérégie Ouest,Rigaud,2850,45.46034,-74.39646,Clay,3.3,Conventional,Grassland,3,Cattle slurry
+Corn,110,2012,Montérégie Est,St-Hyacinthe,2850,45.55255,-72.90020,Clay loam,2.6,Reduced tillage,Soybean,0,Poultry manure
+Corn,112,2012,Montérégie Ouest,St-Patrice-de-Sherrington,2850,45.19240,-73.47068,Sandy loam,4.0,Reduced tillage,Soybean,0,Mineral
+Corn,114,2012,Montérégie Ouest,Hemmingford,2850,45.04373,-73.48348,Clay loam,11.5,Reduced tillage,Soybean,0,Poultry manure
+Corn,201,2013,Montérégie Ouest,St-Isidore,2850,45.33500,-73.62000,Clay loam,5.1,Conventional,Grassland,3,Mineral
+Corn,202,2013,Montérégie Ouest,St-Sébastien,2850,45.13008,-73.14157,Clay loam,5.5,Conventional,Grassland,7,Cattle slurry
+Corn,203,2013,Montérégie Est,St-Césaire,2850,45.39367,-73.00862,Clay loam,NA,NA,Grassland,> 1,NA
+Corn,204,2013,Montérégie Est,St-Mathieu-de-Beloeil,2850,45.56000,-73.22000,Clay loam,4.9,No-Till,Soybean,0,Mineral
+Corn,205,2013,Montérégie Est,St-Dominique,2850,45.53600,-72.81300,Clay loam,7.0,Reduced tillage,Soybean,0,Organic
+Corn,206,2013,Montérégie Est,St-Louis-de-Gonzague,2850,45.24000,-73.97000,Sandy loam,2.4,Conventional,Grassland,2,Mineral
+Corn,207,2013,Montérégie Ouest,Ste-Marguerite,2850,45.38500,-73.55000,Loam,4.0,Conventional,Grassland,> 5,Mineral
+Corn,208,2013,Montérégie Est,St-Hyacinthe,2850,45.58000,-72.93000,Loam,3.0,Reduced tillage,Soybean,0,Poultry manure
+Corn,209,2013,Montérégie Est,Ange-Gardien,2850,45.37013,-72.87527,Organic,NA,NA,Grassland,> 1,NA
+Corn,211,2013,Montérégie Ouest,Saint-Patrice-de-Sherrington,2850,45.15000,-73.45000,Clay loam,3.5,Reduced tillage,Soybean,0,Mineral
+Corn,212,2013,Montérégie Ouest,St-Bernard-de-Lacolle,2850,45.09860,-73.42219,Loam,11.9,Reduced tillage,Grassland,3,Cattle slurry
+Corn,213,2013,Montérégie Ouest,St-Bernard-de-Lacolle,2850,45.07197,-73.39314,Organic,41.0,Reduced tillage,Soybean,0,Cattle slurry
+Corn,214,2013,Montérégie Ouest,St-Bernard-de-Lacolle,2850,45.07000,-73.55000,Organic,20.4,No-Till,Soybean,0,Poultry manure
+Corn,1,2014,Chaudière-Appalaches,St-Flavien,2400,46.50894,-71.58924,Loam,5.5,No-Till,Soybean,0,Cattle slurry
+Corn,3,2014,Chaudière-Appalaches,St-Édouard-de-Lotbinière,2400,46.57892,-71.77250,Clay,NA,Conventional,Grassland,> 3,Cattle slurry
+Corn,5,2014,Centre-du-Québec,Grand-St-Esprit,2700,46.22331,-72.55478,Sand,2.2,Reduced tillage,Soybean,0,Poultry manure
+Corn,7,2014,Centre-du-Québec,Ste-Perpétue,2700,46.06173,-72.37139,Sand,NA,Reduced tillage,Soybean,0,Mineral
+Corn,8,2014,Centre-du-Québec,St-Germain-de-Grantham,2700,45.80609,-72.55020,Sandy loam,7.4,Reduced tillage,Grassland,8,Cattle slurry
+Corn,10,2014,Lanaudière,St-Félix-de-Valois,2400,46.19003,-73.41808,Sandy loam,4.5,Conventional,Grassland,8,Cattle slurry
+Corn,11,2014,Lanaudière,Mascouche,2700,45.76041,-73.60176,Clay,3.5,No-Till,Soybean,0,Mineral
+Corn,12,2014,Lanaudière,St-Élisabeth,2700,46.08271,-73.33457,Clay loam,3.7,Reduced tillage,Soybean,0,Mineral
+Corn,13,2014,Laurentides,Oka,2700,45.53831,-74.08073,Clay,4.9,Reduced tillage,Soybean,0,Mineral
+Corn,14,2014,Laurentides,Mirabel,2700,45.53849,-74.10994,Sandy loam,NA,Reduced tillage,Grassland,> 3,NA
+Corn,15,2014,Laurentides,Ste-Anne-des-Plaines,2700,45.75308,-73.78564,Clay loam,5.4,Reduced tillage,Soybean,0,Mineral
+Corn,16,2014,Laurentides,St-Jérôme,2400,45.61165,-73.97808,Clay,10.1,No-Till,Soybean,0,Mineral
+Corn,19,2014,Estrie,St-Georges-de-Windsor,2400,45.67631,-71.86966,Sand,7.8,Reduced tillage,Soybean,0,NA
+Corn,20,2014,Estrie,St-Georges-de-Windsor,2400,45.69899,-71.85065,Loam,6.9,Reduced tillage,Soybean,0,Pig slurry
+Corn,21,2014,Montérégie Est,St-Mathieu-de-Beloeil,2850,45.58654,-73.24799,Clay,5.2,No-Till,Soybean,0,Cattle slurry
+Corn,22,2014,Montérégie Est,St-Mathieu-de-Beloeil,2850,45.58684,-73.24649,Clay,4.9,No-Till,Grassland,3,Cattle slurry
+Corn,24,2014,Montérégie Est,St-Alphonse-de-Granby,2850,45.30626,-72.86347,Sandy loam,5.1,Conventional,Grassland,4,Cattle slurry
+Corn,25,2014,Montérégie Ouest,St-Alexandre,2850,45.21325,-73.17754,Sandy loam,2.9,Conventional,Grassland,6,Cattle slurry
+Corn,28,2014,Montérégie Ouest,St-Constant,2850,45.32894,-73.60636,Clay loam,4.4,Conventional,Grassland,3,Mineral
+Corn,50,2015,Chaudière-Appalaches,St-Édouard-de-Lotbinière,2400,46.57939,-71.77496,Clay,NA,No-Till,Soybean,0,Mineral
+Corn,51,2015,Chaudière-Appalaches,Ste-Agathe-de-Lotbinière,2400,46.41419,-71.20873,Loam,6.1,No-Till,Soybean,0,Organic
+Corn,54,2015,Centre-du-Québec,Nicolet,2700,46.24278,-72.60064,Sand,2.7,Reduced tillage,Soybean,0,Organic
+Corn,55,2015,Centre-du-Québec,Grand-St-Esprit,2700,46.15910,-72.48460,Loam,6.6,Reduced tillage,Soybean,0,Mineral
+Corn,56,2015,Centre-du-Québec,St-Bonaventure,2700,45.97083,-72.69659,Clay,NA,No-Till,Grassland,4,Organic
+Corn,57,2015,Centre-du-Québec,St-Germain-de-Grantham,2700,45.84242,-72.53965,Sandy loam,3.9,Conventional,Grassland,4,Mineral
+Corn,58,2015,Lanaudière,St-Ambroise-de-Kildare,2400,46.57865,-71.77532,Loam,5.0,Conventional,Soybean,0,Paper-mill sludge
+Corn,59,2015,Lanaudière,St-Ambroise-de-Kildare,2400,46.10327,-73.57177,Loam,3.5,Conventional,Grassland,4,Organic
+Corn,60,2015,Lanaudière,Ste-Élisabeth,2700,46.09544,-73.33467,Clay loam,4.9,Reduced tillage,Soybean,0,Paper-mill sludge
+Corn,61,2015,Lanaudière,Ste-Élisabeth,2400,46.07100,-73.40101,Sandy loam,4.4,Reduced tillage,Grassland,7,Organic
+Corn,62,2015,Laurentides,Oka,2700,45.53296,-74.07494,Clay loam,6.8,Reduced tillage,Grassland,4,Mineral
+Corn,63,2015,Laurentides,St-Placide,2700,45.53881,-74.18654,Clay,NA,No-Till,Soybean,0,Organic
+Corn,64,2015,Laurentides,Ste-Anne-des-Plaines,2700,45.75588,-73.82703,Clay loam,5.1,Reduced tillage,Soybean,0,Organic
+Corn,65,2015,Laurentides,Ste-Anne-des-Plaines,2700,45.75462,-73.81140,Clay,4.6,Reduced tillage,Soybean,0,Mineral
+Corn,66,2015,Estrie,St-Georges-de-Windsor,2400,45.67040,-71.86847,Sandy loam,9.5,No-Till,Soybean,0,Organic
+Corn,67,2015,Estrie,St-Georges-de-Windsor,2400,45.67010,-71.86163,Sandy loam,8.8,No-Till,Soybean,0,Organic
+Corn,68,2015,Estrie,Compton,2400,45.22887,-71.89480,Loam,6.4,Reduced tillage,Grassland,5,Mineral
+Corn,70,2015,Montérégie Est,St-Mathieu-de-Beloeil,2850,45.58700,-73.24763,Clay,5.2,Conventional,Soybean,0,Cattle slurry
+Corn,71,2015,Montérégie Est,St-Mathieu-de-Beloeil,2850,45.58814,-73.24805,Clay,4.9,Conventional,Grassland,3,Cattle slurry
+Corn,72,2015,Montérégie Est,St-Dominique,2850,45.53566,-72.81505,Clay loam,7.0,Reduced tillage,Soybean,0,Organic
+Corn,73,2015,Montérégie Est,St-Dominique,2850,45.58307,-72.79997,Sandy loam,7.4,Reduced tillage,Soybean,0,Mineral
+Corn,75,2015,Montérégie Ouest,St-Édouard-de-Napierville,2850,45.20367,-73.52505,Sandy loam,8.4,Conventional,Grassland,20,Mineral
+Corn,76,2015,Montérégie Ouest,St-Jean-sur-Richelieu,2850,45.36691,-73.36896,Clay,NA,Conventional,Grassland,>10,Organic
+Corn,77,2015,Montérégie Ouest,St-Urbain-Premier,2850,45.25293,-73.73214,Clay,5.3,No-Till,Soybean,0,Mineral
+Soybean,101,2015,Centre-du-Québec,Nicolet,2600,46.264245,-72.600175,Sandy loam,4.3,Reduced tillage,Cereal,--,None
+Soybean,102,2015,Centre-du-Québec,Durham,2600,45.689266,-72.437038,Sandy loam,5.6,No-Till,Corn,--,None
+Soybean,104,2015,Montérégie-Est,St-Hilaire,2600,45.59432,-73.14678,Sandy loam,2.3,Reduced tillage,Corn,--,None
+Soybean,105,2015,Montérégie-Est,Roxton Pond,2600,45.504413,-72.651012,Sandy loam,7.7,No-Till,Corn,--,None
+Soybean,106,2015,Montérégie-Est,St-Mathieu-de-Beloeil,2600,45.58816,-73.24807,Clay loam,4.5,Reduced tillage,Corn,--,None
+Soybean,107,2015,Montérégie-Est,St-Mathieu-de-Beloeil,2600,45.586852,-73.253988,Clay loam,5.1,Reduced tillage,Cereal,--,None
+Soybean,108,2015,Montérégie-Ouest,Marieville,2600,45.471745,-73.177648,Clay loam,3.7,Conventional,Cereal,--,None
+Soybean,210,2016,Centre-du-Québec,St-Théodore-d'Acton,2600,45.69804,-72.52234,Sandy loam,3.3,No-Till,Corn,--,None
+Soybean,211,2016,Centre-du-Québec,Nicolet,2600,46.28094,-72.58617,Sandy loam,NA,Conventional,Cereal,--,None
+Soybean,212,2016,Centre-du-Québec,Drummondville,2600,45.76705,-72.40892,Sand,3.6,Reduced tillage,Corn,--,None
+Soybean,213,2016,Montérégie-Est,Marieville,2600,45.43792,-73.14041,Clay loam,6.1,No-Till,Corn,--,None
+Soybean,214,2016,Montérégie-Est,Beloeil,2600,45.61317,-73.20453,Clay loam,2.9,Reduced tillage,Cereal,--,None
+Soybean,215,2016,Montérégie-Est,St-Liboire,2600,45.64299,-72.78564,Sandy loam,6.5,Reduced tillage,Cereal,--,None
+Soybean,216,2016,Montérégie-Ouest,St-Anicet,2600,45.11411,-74.26823,Clay loam,NA,NA,Corn,--,None
+Soybean,217,2016,Montérégie-Ouest,St-Anicet,2600,45.10357,-74.25619,Clay loam,NA,NA,Corn,--,None
+Soybean,218,2016,Montégérie-Est,St-Mathieu-de-Beloeil,2600,45.586752,-73.24776,Clay,6.2,Reduced tillage,Corn,--,None

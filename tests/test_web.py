@@ -41,3 +41,13 @@ def test_make_gif_writes_every_frame(tmp_path):
     assert mod.make_gif(tmp_path, out, fps=10, width=32) == 3
     with Image.open(out) as g:
         assert g.n_frames == 3 and g.width == 32
+
+
+def test_trap_thresholds_match_the_engine():
+    """The count sheet in the browser and the rule engine compare against the same thresholds."""
+    from taupin.engine import TRAP_THRESHOLD
+
+    src = (WEB / "js/scout.js").read_text()
+    body = re.search(r"export const THRESHOLDS = \{([^}]*)\}", src).group(1)
+    web = {k: float(v) for k, v in re.findall(r"(\w+):\s*([\d.]+)", body)}
+    assert web == TRAP_THRESHOLD
