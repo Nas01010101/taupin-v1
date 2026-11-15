@@ -1,7 +1,7 @@
 # Taupin: project file
 
 NASA Space Apps 2026, challenge "Field Shift: Adapting Farms with NASA Data".
-Submission closes 2026-11-15 23:59 local time. Last updated 2026-11-14.
+Submission closes 2026-11-15 23:59 local time. Last updated 2026-11-15.
 
 ## Pitch
 
@@ -69,6 +69,9 @@ open complement, not a stronger predictor.
 | Launchers for macOS, Windows and Linux | on `main` | `run.command`, `run.bat`, `run.sh` |
 | Pitch deck | 7 slides, published as a web page | shared as "anyone with the link"; open it once in a private window before submission |
 | Trap dates and field ranking for any coordinates | on `build` | `web/js/power.js`, `web/test/power.test.mjs` |
+| Six-step farmer flow on the first screen; model numbers under "Details" | on `claude/two-versions` | `web/index.html`, `web/app.css` |
+| Photo finds logged with a position on the device, pins, CSV and GeoJSON export, in the record | on `claude/two-versions` | `web/js/finds.js`, `web/test/finds.test.mjs` |
+| Research outline and challenge fit | on `claude/two-versions` | `docs/RESEARCH.md`, `docs/CHALLENGE_FIT.md` |
 
 ## Data
 
@@ -146,6 +149,8 @@ Limits, stated as measured:
   lists it as a risk factor.
 
 ## Fit with the judging criteria
+
+The full table, with file paths and weak points, is in `docs/CHALLENGE_FIT.md`.
 
 | Criterion | What answers it |
 |---|---|

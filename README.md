@@ -14,6 +14,19 @@ Built for NASA Space Apps 2026. Taupin is French for wireworm and click beetle.
 
 ![Demo: a photo is classified, pinned on the field, and the risk table shows what it changes](docs/assets/demo.gif)
 
+## Two audiences
+
+One codebase, two versions that share the NASA rules, the photo model and the 3D field:
+
+- **Farmers and agronomists: the web app** (`web/`). The first screen is six steps: your field,
+  trap week, where to trap, enter counts, photo, what to plant. Model numbers sit under "Details"
+  at the bottom of the page.
+- **Researchers: [`docs/RESEARCH.md`](docs/RESEARCH.md)**, a paper outline: question, methods,
+  current results from `risk/model/metrics.json` and `model/metrics.json`, limits, planned
+  benchmarks and candidate venues.
+
+How Taupin answers the challenge and its judging criteria: [`docs/CHALLENGE_FIT.md`](docs/CHALLENGE_FIT.md).
+
 ## What it does
 
 - **Why.** Since 1 August 2025 in Quebec, insecticide-coated seed (class 3A) needs an agronomist's
@@ -38,6 +51,10 @@ Built for NASA Space Apps 2026. Taupin is French for wireworm and click beetle.
 - **Identify.** Drop a photo; an 8-class model (DINOv2-S, ONNX, run with onnxruntime-web) names
   the animal and pins it on the field. Below its abstain threshold it answers "unclear" and shows
   how to send the photo to the MAPAQ plant diagnostic lab. Taupin sends nothing.
+- **Log finds.** After a photo is named, "Save where I found it" reads the device position, or the
+  photo's GPS if you choose that, only on that tap. Finds stay in the browser, show as pins on the
+  field when they fall in the demo square, go into the agronomist record and export as CSV and
+  GeoJSON. The latest find fills in the coordinates for "Your field". "Delete all finds" clears them.
 - **Plan.** Wireworm and corn rootworm levels for 2026 to 2030 under corn every year,
   corn-soybean-wheat, and a rotation with buckwheat. Each level lists its reasons with a source.
 - **Hand over.** Trap points as GPX, CSV and GeoJSON, and a text record with the trap date, the
