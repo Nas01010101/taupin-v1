@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Taupin click beetle">
   <title>Taupin</title>
-  <g fill="#15160f" stroke="#15160f" stroke-linecap="round">
+  <g fill="#14532d" stroke="#14532d" stroke-linecap="round">
     <path d="M29 9 24 3M35 9l5-6M22 23l-6-3M42 23l6-3M22 37l-7 2M42 37l7 2M23 47l-6 5M41 47l6 5" fill="none" stroke-width="2.4"/>
     <ellipse cx="32" cy="11.5" rx="5" ry="4" stroke="none"/>
     <path d="M26 15c4-1.6 8-1.6 12 0 3 3 4 8 4 12l2.5 4.5h-25L22 27c0-4 1-9 4-12z" stroke="none"/>
