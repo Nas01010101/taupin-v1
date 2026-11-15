@@ -210,3 +210,34 @@ details.more summary { cursor: pointer; padding: var(--s1) 0; }
 #find-status:empty { display: none; }
 @media (max-width: 900px) { .flow { padding: var(--s3); } }
 [hidden] { display: none !important; }
+
+/* Step 6: priorities, soil and water table, rotation cards. */
+.pri { border: 0; padding: 0; margin: 0 0 var(--s3); display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); }
+.pri legend { font-weight: 600; font-size: var(--t-s); margin-bottom: var(--s2); padding: 0; }
+.chk { font-size: var(--t-s); display: inline-flex; gap: var(--s1); align-items: center; }
+.sw-sel { display: flex; flex-wrap: wrap; gap: var(--s4); margin-bottom: var(--s4); font-size: var(--t-s); }
+.sw-sel select { margin-left: var(--s1); font: inherit; }
+table.sw { border-collapse: collapse; font-size: var(--t-s); width: 100%; margin-bottom: var(--s4); }
+table.sw th, table.sw td { text-align: left; vertical-align: top; padding: var(--s1) var(--s2); border-bottom: 1px solid var(--surface2); }
+table.sw thead th { font-weight: 600; font-size: var(--t-xs); color: var(--muted); }
+table.sw td { font-variant-numeric: tabular-nums; }
+table.sw tr.cur { background: var(--surface); }
+table.sw sup { color: var(--muted); margin-left: 2px; }
+.tag { font-size: var(--t-xs); background: var(--fg); color: var(--bg); border-radius: 4px; padding: 0 var(--s1); font-weight: 400; }
+.rots { display: grid; gap: var(--s4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); margin-bottom: var(--s4); }
+.rot { background: var(--surface); border-radius: var(--r); padding: var(--s4); min-width: 0; font-size: var(--t-s); }
+.rot.cur { outline: 2px solid var(--accent); }
+.rot h4 { font-size: var(--t-s); margin: var(--s3) 0 var(--s1); }
+.rot ul { margin: 0; padding-left: var(--s4); }
+.rot ul.good li::marker { content: "+ "; color: var(--accent); }
+.rot ul.bad li::marker { content: "− "; color: var(--high); }
+.seq { list-style: none; padding: 0; margin: 0 0 var(--s3); display: flex; flex-wrap: wrap; gap: var(--s1); }
+.seq li { background: var(--surface2); border-radius: 4px; padding: 2px var(--s2); display: flex; flex-direction: column; }
+.seq span { font-size: var(--t-xs); color: var(--muted); }
+details.how { margin-bottom: var(--s5); font-size: var(--t-s); }
+details.how summary { cursor: pointer; color: var(--accent); margin-bottom: var(--s2); }
+.sparks { display: flex; flex-wrap: wrap; gap: var(--s4); }
+.spark { margin: 0; width: min(100%, 300px); }
+.spark svg { width: 100%; height: auto; color: var(--accent); }
+.spark text { font-size: 10px; fill: var(--muted); }
+.spark figcaption { font-size: var(--t-xs); color: var(--muted); }

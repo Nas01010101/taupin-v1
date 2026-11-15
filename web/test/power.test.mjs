@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { parseCoords, coordText, powerURL, series, crossing, degreeDayDate, doy, doyLabel, linearTrend, liveSoil, liveFieldRisk, fetchField } from '../js/power.js';
+import { parseCoords, coordText, powerURL, series, crossing, degreeDayDate, doy, doyLabel, linearTrend, liveSoil, liveFieldRisk, fetchField, weatherURL, weatherFrom } from '../js/power.js';
 
 const J = p => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'));
 const soil = J('../data/soil.json'), fr = J('../data/field_risk.json'), fx = J('./fixtures/power_2025.json');
@@ -73,10 +73,21 @@ test('soil already at 12 °C on 1 March is flagged; soil that never warms is an 
   assert.throws(() => liveSoil({ 20200301: -999 }, soil.sources), /no soil temperature/);
 });
 
-test('fetchField: one GET, and a failed answer becomes a message', async () => {
+test('fetchField: soil GET plus a UTC weather GET, and a failed answer becomes a message', async () => {
   const calls = [], ok = async u => { calls.push(u); return { ok: true, json: async () => fx }; };
   await assert.rejects(fetchField({ lat: 45.5, lon: -73.7 }, { soil, fieldRisk: fr }, { fetch: ok }), /enough years/);   // the fixture holds one spring
-  assert.equal(calls.length, 1);
+  assert.equal(calls.length, 2);
+  assert.ok(calls.some(u => /IMERG_PRECTOT/.test(u) && /time-standard=UTC/.test(u)));
   await assert.rejects(fetchField({ lat: 0, lon: 0 }, { soil, fieldRisk: fr }, { fetch: async () => ({ ok: false, status: 502 }) }), /answered 502/);
   await assert.rejects(fetchField({ lat: 0, lon: 0 }, { soil, fieldRisk: fr }, { fetch: async () => ({ ok: true, json: async () => ({}) }) }), /no data/);
+});
+
+test('weatherURL asks for IMERG in UTC days; weatherFrom drops fill and rejects a mostly empty series', () => {
+  const u = new URL(weatherURL({ lat: 45.5, lon: -73.7 }));
+  assert.equal(u.searchParams.get('time-standard'), 'UTC');
+  assert.equal(u.searchParams.get('start'), '20010101');
+  const p = { IMERG_PRECTOT: { 20010101: 1.26, 20010102: 0 }, T2M_MAX: { 20010101: -3, 20010102: -999 }, T2M_MIN: { 20010101: -9, 20010102: -12 } };
+  const w = weatherFrom(p, { lat: 45.5, lon: -73.7 });
+  assert.deepEqual([w.start, w.rain, w.tmax], ['2001-01-01', [1.3, 0], [-3, null]]);
+  assert.equal(weatherFrom({ IMERG_PRECTOT: { 20010101: -999, 20010102: -999 } }, {}), null);
 });

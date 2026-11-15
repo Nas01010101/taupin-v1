@@ -4,8 +4,10 @@ Input: a POWER daily JSON that carries TSOIL1. The field layers (field.json, lay
 `taupin.layers`.
 Outputs in web/data/:
   soil.json    trap window per year, 12 C trend, Mar-Jul daily TSOIL1 for the recent years
-  risk.json    3 rotations x 5 years wireworm / corn rootworm levels for two soil zones and two
+  risk.json    4 rotations x 5 years wireworm / corn rootworm levels for two soil zones and two
                evidence scenarios, every line with its source (taupin.engine)
+weather.json (GPM IMERG rain, air temperature) and smap.json come from `taupin.weather` and
+`taupin.smap`; crops.json and rotations.json are written by hand, a source key per value.
 
     uv run --extra bake python -m taupin.bake \
         --tsoil ../wireworm-risk-twin/data/power_daily.json

@@ -72,12 +72,17 @@ open complement, not a stronger predictor.
 | Six-step farmer flow on the first screen; model numbers under "Details" | on `claude/two-versions` | `web/index.html`, `web/app.css` |
 | Photo finds logged with a position on the device, pins, CSV and GeoJSON export, in the record | on `claude/two-versions` | `web/js/finds.js`, `web/test/finds.test.mjs` |
 | Research outline and challenge fit | on `claude/two-versions` | `docs/RESEARCH.md`, `docs/CHALLENGE_FIT.md` |
+| Four rotations scored on dry-year water, bare-soil heavy rain, USLE cover, nitrogen, residue and pests; farmer priorities; why, evidence, gaps and risks per rotation | on `soil-water` | `web/js/soilwater.js`, `web/js/swui.js`, `web/data/crops.json`, `web/data/rotations.json`, `web/test/soilwater.test.mjs` |
+| GPM IMERG daily rain and SMAP L4 soil moisture | on `soil-water` | `src/taupin/weather.py`, `src/taupin/smap.py`, `tests/test_soilwater_bake.py` |
 
 ## Data
 
 | Source | Variables | Used for |
 |---|---|---|
 | NASA POWER daily point API (MERRA-2, 0.5 x 0.625 degree) | `TSOIL1`, `GWETROOT`, `PRECTOTCORR`, `T2M` | trap date; four of the risk model's candidate features |
+| NASA GPM IMERG via POWER (`IMERG_PRECTOT`, UTC days), POWER `T2M_MAX`, `T2M_MIN`, 2001 to 2025 | daily rain, air temperature | rotation water need, season rain, heavy-rain days on bare soil |
+| NASA SMAP L4 analysed root-zone soil moisture, GIBS, 252 dates, 2015 to 2025 | m3/m3 | check of the POWER wetness input (anomaly r = 0.78, 126 months) |
+| FAO-56, OMAFRA 23-005, CRAAQ and MAPAQ grids, Lal 2005, CGQ yields | crop coefficients, USLE C, nitrogen rates, residue ratios | rotation soil and water columns (`web/data/crops.json`) |
 | NASA HLS v2.0 (L30 and S30), 23 clear summer scenes, 2020 to 2025 | NDVI | vegetation layer of the 3D field; one input of the scouting zones |
 | Landsat 8/9 Collection 2 Level-2, 46 clear April and May scenes, 2016 to 2025 | surface temperature | spring warm and cold parts of the field |
 | NRCan HRDEM lidar, 1 m, 2023 | terrain, canopy height | relief, slope, wetness index and open ground of the 3D field |
@@ -173,7 +178,7 @@ The full table, with file paths and weak points, is in `docs/CHALLENGE_FIT.md`.
 | No test photos taken in Quebec fields; outside-set audit has one rater | open | field photos from trails on 15 November, labelled as staged where they are |
 | "Over 90 %" | two sources, same research group | Labrie et al. 2020: 92.6 % of corn fields under 1 wireworm per trap (84 fields, 2012 to 2016). CÉROM report PV-3.2-2015-002: the threshold was exceeded in 10 % of cases in the 2011 to 2015 surveys, and in 25 % of 163 sites chosen for higher risk in 2016. Cite both in the deck |
 | Deck slide 6 and its capture showed the previous photo model | done | rebuilt from `model/metrics.json`; the cover runs `web/js/scene.js` on the same layer files as the app |
-| "Use my field": any coordinates, live NASA POWER call | done on `build` | `web/js/power.js` asks NASA POWER for TSOIL1 and GWETROOT at the entered coordinates and gives the trap date, the yearly dates and the field ranking; the two coordinates are the only thing sent. For the demo site the browser result equals the baked `soil.json` and `field_risk.json` (31 years of dates, 11 years of ranking inputs, 0 differences). The 3D field, the trap points and the rotation table stay the demo square |
+| "Use my field": any coordinates, live NASA POWER call | done on `build` | `web/js/power.js` asks NASA POWER for TSOIL1 and GWETROOT at the entered coordinates and gives the trap date, the yearly dates and the field ranking; the two coordinates are the only thing sent. For the demo site the browser result equals the baked `soil.json` and `field_risk.json` (31 years of dates, 11 years of ranking inputs, 0 differences). The 3D field, the trap points and the pest levels stay the demo square; the rotation water columns use the field's own IMERG rain |
 | 3D field and trap points for any field | open | needs lidar, HLS, Landsat and the soil map fetched per field; today they are baked for one square |
 | Route to the Quebec lab for unclear photos | done on `build` | an unclear photo shows the lab's steps: online form first, then images by email or samples by post, first answer in 24 to 48 h (MAPAQ Laboratoire d'expertise et de diagnostic en phytoprotection, quebec.ca). The farmer sends it; the app sends nothing |
 | French interface | open | the users are Quebec farmers |
@@ -182,10 +187,37 @@ The full table, with file paths and weak points, is in `docs/CHALLENGE_FIT.md`.
 | The demo field is a park, not a farm; 1.3 ha of the square is open ground | known | shown as a scenario; no trapping or digging in the park |
 | No field trial of the tool with a farmer or agronomist | known | outside the weekend's scope |
 
+### Soil and water: what the rotation model leaves out
+
+The brief asks for soil health and water. Step 6 now scores four rotations on five priorities. The
+demo field on equal weights, fall plough, as `web/js/soilwater.js` computes them from
+`web/data/weather.json` (the tests check the nitrogen totals and the rank order):
+
+| Rotation | Dry-year water, mm | Heavy rain on bare soil, days in 5 years | USLE C | N to buy, kg/ha in 5 years | Residue, t/ha a year |
+|---|---|---|---|---|---|
+| Corn every year | 32 spare | 7 | 0.40 | 725 | 7.7 |
+| Corn and soybean (current) | 18 short | 8.5 | 0.44 | 415 | 5.7 |
+| Corn, soybean, wheat | 47 short | 9.6 | 0.43 | 400 | 5.1 |
+| With buckwheat | 35 short, 1 year unknown | ? | 0.4 | ? | 5.7 |
+
+Corn every year ranks first on equal weights. That is the model's output, and it shows what the
+model leaves out:
+
+| Gap | Effect on the ranking | Next step |
+|---|---|---|
+| Soil water stored at sowing is not counted | a crop sown early (wheat) looks drier than it is | FAO-56 Ch. 8 soil water balance started from SMAP or GWETROOT at sowing, with available water from the CanSIS soil tables |
+| No yield penalty for corn after corn | corn every year gets full residue and no yield loss | a sourced penalty from Quebec or Ontario trials applied to yield, residue and nitrogen |
+| No cover crops | wheat and soybean years keep bare soil after harvest | a cover crop option after wheat and soybean, with its USLE C and nitrogen effect |
+| USLE uses C only; K and LS of the field are not used | soil loss is compared, not estimated in t/ha | A = R K LS C P for the demo square from HRDEM slope and CanSIS texture; slope class from the farmer elsewhere |
+| Buckwheat has no FAO-56 coefficient, Quebec nitrogen rate or CGQ yield | its rotation ranks after the fully scored ones | find a measured coefficient and a CRAAQ rate; until then ? stays ? |
+| Pest levels are the demo square's for any field | pest points do not follow the farmer's history | ask for the last two crops and feed them to `web/js/risk.js` |
+| Equal weights, no yield or price | the ranking ignores income | farmer weights per priority; CGQ prices per crop |
+| SMAP for the demo field only | no satellite soil moisture for another field | check whether GIBS answers browser requests; if yes, fetch the 0.4 degree box for the entered point |
+
 ## Submission checklist
 
 - [ ] Deck at 7 slides or fewer (done), public link, no login (shared as "anyone with the link"; check it in a private window)
 - [ ] Public repository with licence, README, run commands
-- [ ] References list covering NASA POWER, HLS, Landsat, HRDEM, IRDA, CanSIS, OpenStreetMap, Labrie et al. 2020, GBIF, Wikimedia Commons, VFF QC, RAP and MAPAQ documents
+- [ ] References list covering NASA POWER, GPM IMERG, SMAP L4, FAO-56, OMAFRA 23-005, CRAAQ and MAPAQ nitrogen grids, Lal 2005, HLS, Landsat, HRDEM, IRDA, CanSIS, OpenStreetMap, Labrie et al. 2020, GBIF, Wikimedia Commons, VFF QC, RAP and MAPAQ documents
 - [ ] All text in English
 - [ ] Every number in the deck and README traceable to `model/metrics.json` or `risk/model/metrics.json`

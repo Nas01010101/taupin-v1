@@ -4,7 +4,9 @@ import * as ort from '../vendor/ort/ort.wasm.min.mjs';
 import { createScene } from './scene.js';
 import { VIEWS } from './layers.js';
 import { loadModel, classifyPixels } from './model.js';
-import { effectFor, riskView, trapWindow } from './risk.js';
+import { effectFor, riskView, trapWindow, ROTATION_NAMES } from './risk.js';
+import { climatology, rotationMetrics, rank } from './soilwater.js';
+import * as sw from './swui.js';
 import { fieldRanking } from './fieldrisk.js';
 import { parseCoords, coordText, fetchField } from './power.js';
 import { formatAnswer } from './classify.js';
@@ -16,7 +18,7 @@ const $ = s => document.querySelector(s);
 const getJSON = async p => { const r = await fetch(p); if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); };
 const PIN = { wireworm: 0xe3a93f, rootworm: 0xb3361f, beneficial: 0x4f9a5a, none: 0x8a8f8c, unscored: 0x8a8f8c, unclear: 0xf2f2f2 };
 
-const state = { zone: 'upland', sel: null, rankYear: null, forage: 0, evidence: [], current: { kind: 'idle' }, model: { status: 'loading' } };
+const state = { sw: { chosen: ['pests', 'water', 'soil', 'nitrogen', 'organic'], current: null, tillage: 'fall_plow' }, zone: 'upland', sel: null, rankYear: null, forage: 0, evidence: [], current: { kind: 'idle' }, model: { status: 'loading' } };
 let D, scene;
 
 // The count sheet lives in this browser only (localStorage); nothing is sent anywhere.
@@ -82,6 +84,7 @@ const OWN_KEY = 'taupin-own';
 function useField(own, note = '') {
   state.own = own && own.site;
   D.soil = own ? own.soil : D.demo.soil; D.fieldRisk = own ? own.fr : D.demo.fieldRisk;
+  D.weather = own?.weather ?? D.demo.weather;
   const years = Object.keys(D.fieldRisk.per_year).sort();
   state.rankYear = years[years.length - 1];
   $('#rank-year').innerHTML = years.map(y => `<option${y === state.rankYear ? ' selected' : ''}>${ui.esc(y)}</option>`).join('');
@@ -89,9 +92,28 @@ function useField(own, note = '') {
   $('#own-status').textContent = note || (own
     ? `Showing ${coordText(own.site)}, fetched ${own.fetched}. NASA POWER is modelled on a grid of about 50 km, so neighbouring fields get the same values. `
       + (own.soil.always_warm ? 'The soil here is already at 12 °C on 1 March, so the date rule, written for Quebec springs, says nothing useful. ' : '')
-      + 'The 3D field, the trap points and the rotation table are still the demo square.'
+      + (own.weather ? 'The rotation water columns use this field\'s GPM IMERG rain. ' : 'NASA POWER sent no IMERG rain, so the rotation water columns are the demo field\'s. ')
+      + 'The 3D field, the trap points and the pest levels are still the demo square.'
     : `Showing the demo field, ${D.field.site.name}.`);
   renderPanel(); renderRank();
+}
+
+// Water climatology per weather series; recomputed only when the field changes.
+const climCache = new WeakMap();
+function climNow() {
+  if (!D.weather) return null;
+  if (!climCache.has(D.weather)) climCache.set(D.weather, climatology(D.weather, D.crops.crops, D.weather.site?.lat ?? D.field.site.lat, D.crops.heavy_rain_mm));
+  return climCache.get(D.weather);
+}
+
+function renderSoilWater(view) {
+  const clim = climNow(), o = state.sw, ids = view.rows.map(r => r.rotation);
+  const byId = Object.fromEntries(view.rows.map(r => [r.rotation, rotationMetrics(D.risk.rotations[r.rotation], clim ?? { crops: {} }, D.crops, r, o.tillage)]));
+  const ranked = rank(ids.map(id => ({ id, metrics: byId[id] })), o.chosen);
+  const names = Object.fromEntries(ids.map(id => [id, ROTATION_NAMES[id] ?? id]));
+  $('#sw-table').innerHTML = sw.tableHTML(ranked, byId, names, o.current);
+  $('#sw-cards').innerHTML = sw.cardsHTML(ranked, byId, { names, texts: D.rotations.rotations, current: o.current, cropData: D.crops, sequences: D.risk.rotations, chosen: o.chosen });
+  $('#sw-how').innerHTML = sw.climateHTML(clim, D.crops, D.weather, state.own ? coordText(state.own) : D.field.site.name);
 }
 
 async function loadOwn(site) {
@@ -121,6 +143,7 @@ function renderPanel() {
   $('#risk-summary').innerHTML = ui.riskSummaryHTML(view);
   $('#risk-table').innerHTML = ui.riskTableHTML(view, state.sel);
   $('#trace').innerHTML = ui.traceHTML(view, state.sel);
+  renderSoilWater(view);
   const tw = trapWindow(D.soil);
   $('#h-trap').textContent = `2. Trap week: set bait traps around ${tw.mean12}`;
   $('#trap-lede').textContent = `The week the top 10 cm of soil reaches 12 °C. NASA POWER, mean of ${tw.span[0]}-${tw.span[1]}${state.own ? ` at ${coordText(state.own)}` : ''}.`;
@@ -285,6 +308,11 @@ function bind() {
     try { await navigator.clipboard.writeText(recordNow()); e.target.textContent = 'Copied'; }
     catch { getSelection().selectAllChildren($('#record')); }   // clipboard refused: leave the text selected
   });
+  $('#sw-controls').addEventListener('change', () => {
+    state.sw.chosen = [...document.querySelectorAll('#sw-controls [name=pri]:checked')].map(i => i.value);
+    state.sw.current = $('#sw-current').value; state.sw.tillage = $('#sw-tillage').value;
+    renderPanel();
+  });
   $('#show-pocket').addEventListener('change', e => scene.setPocket(e.target.checked));
   $('#layer').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b) showLayer(b.dataset.view); });
   scene.onPick((row, col) => {
@@ -303,9 +331,12 @@ function showLayer(key) {
 }
 
 async function main() {
-  const [field, risk, soil, gallery, model, fieldRisk] = await Promise.all(['data/field.json', 'data/risk.json', 'data/soil.json',
-    'data/gallery.json', 'data/risk_model.json', 'data/field_risk.json'].map(getJSON));
-  D = { field, risk, soil, gallery: gallery.items, metrics: null, model, fieldRisk, demo: { soil, fieldRisk } };
+  const [field, risk, soil, gallery, model, fieldRisk, crops, rotations, weather, smap] = await Promise.all(['data/field.json', 'data/risk.json', 'data/soil.json',
+    'data/gallery.json', 'data/risk_model.json', 'data/field_risk.json', 'data/crops.json', 'data/rotations.json', 'data/weather.json', 'data/smap.json'].map(getJSON));
+  D = { field, risk, soil, gallery: gallery.items, metrics: null, model, fieldRisk, crops, rotations, weather, demo: { soil, fieldRisk, weather } };
+  state.sw.current = rotations.default_current in risk.rotations ? rotations.default_current : Object.keys(risk.rotations)[0];
+  $('#sw-controls').innerHTML = sw.controlsHTML({ names: Object.fromEntries(Object.keys(risk.rotations).map(id => [id, ROTATION_NAMES[id] ?? id])), ...state.sw });
+  $('#smap').innerHTML = sw.smapHTML(smap, weather);
   scene = createScene($('#field'), field, 'data/');
   $('#layer').innerHTML = VIEWS.map(v => `<button type="button" class="seg" data-view="${ui.esc(v.key)}" aria-pressed="${v.key === 'terrain'}">${ui.esc(v.label)}</button>`).join('');
   showLayer('terrain');

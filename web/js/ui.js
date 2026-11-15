@@ -83,7 +83,7 @@ export function riskTableHTML(view, sel) {
 export function riskSummaryHTML(view) {
   const parts = [];
   if (view.ww) parts.push(`Arrows show the engine's level if bait traps then reach ${esc(view.threshold)} larvae per trap (${esc(view.genus)}). ` +
-    `Prescription would be supportable in ${view.rxIfTrap} of 15 cells, against ${view.rxCount} now. The photo alone changes no level: it is an identification, not a count.`);
+    `Prescription would be supportable in ${view.rxIfTrap} of ${view.cells} cells, against ${view.rxCount} now. The photo alone changes no level: it is an identification, not a count.`);
   if (view.crw) parts.push('Outlined cells are corn after corn, where rootworm eggs laid this year hatch next year.');
   return parts.length ? `<p class="callout">${parts.join(' ')}</p>` : '';
 }

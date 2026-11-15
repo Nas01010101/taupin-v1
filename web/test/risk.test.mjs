@@ -8,9 +8,9 @@ const data = p => JSON.parse(readFileSync(new URL(`../data/${p}`, import.meta.ur
 const risk = data('risk.json'), soil = data('soil.json'), field = data('field.json');
 const ww = { id: 'wireworm', name: 'Wireworm', unclear: false, prob: 0.9 };
 
-test('baseline table has 3 rotations x 5 years, every cell with a cited trace', () => {
+test('baseline table has 4 rotations x 5 years, every cell with a cited trace', () => {
   const v = riskView(risk, 'upland');
-  assert.equal(v.rows.length, 3);
+  assert.equal(v.rows.length, 4);
   for (const r of v.rows) {
     assert.equal(r.years.length, 5);
     for (const y of r.years) assert.ok(y.trace.length && y.trace.every(t => /\[.+\]$/.test(t)));

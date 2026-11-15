@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Taupin: soil insects on a Quebec parcel</title>
-<meta name="description" content="Identify a soil insect from a photo, see when to set bait traps from NASA POWER soil temperature, and read the wireworm and corn rootworm risk for three rotations.">
+<meta name="description" content="Identify a soil insect from a photo, see when to set bait traps from NASA POWER soil temperature, and compare four crop rotations on soil loss, water, nitrogen and pests with NASA GPM rain and SMAP soil moisture.">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#15160f">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-wkIUCUJPDZDnCpTEaHsG3Is67Qva9sI5aoU4Ek8Vzx4='; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: blob: https://power.larc.nasa.gov; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
@@ -39,7 +39,7 @@
     <li><a href="#sec-traps"><strong>Where to trap.</strong> Ten trap points on the 3D field.</a></li>
     <li><a href="#h-counts"><strong>Enter counts.</strong> Wireworms per trap, against the threshold.</a></li>
     <li><a href="#identify"><strong>Photo.</strong> Name the animal, or send it to the MAPAQ lab.</a></li>
-    <li><a href="#sec-risk"><strong>What to plant.</strong> Three rotations over five years.</a></li>
+    <li><a href="#sec-risk"><strong>What to plant.</strong> Four rotations over five years: soil, water, nitrogen and pests.</a></li>
   </ol>
 </nav>
 <main class="grid">
@@ -120,8 +120,14 @@
     </section>
 
     <section id="sec-risk" aria-labelledby="h-risk">
-      <h2 id="h-risk">6. What to plant: rotating out of corn lowers the risk by 2028</h2>
-      <p class="lede">Wireworm level per year for three rotations. Select a year for its reasons.</p>
+      <h2 id="h-risk">6. What to plant: four rotations for soil, water and pests</h2>
+      <p class="lede">Tick what matters on this farm and mark the rotation you run now. The others are ranked and compared with it.</p>
+      <div id="sw-controls"></div>
+      <div class="table-wrap" id="sw-table"></div>
+      <div id="sw-cards" class="rots"></div>
+      <details class="how"><summary>How the soil and water columns are computed</summary><div id="sw-how"></div></details>
+      <h3>Pest level per year</h3>
+      <p class="small muted">Wireworm and rootworm level per year for each rotation. Select a year for its reasons.</p>
       <div class="zones" role="group" aria-label="Zone">
         <button id="zone-upland" type="button" class="seg" aria-pressed="true">Upland</button>
         <button id="zone-pocket" type="button" class="seg" aria-pressed="false">Low wet pocket</button>
@@ -152,6 +158,7 @@
   </ul>
   <h3>Photo check: test results</h3>
   <div id="model-metrics" class="small"></div>
+  <div id="smap"></div>
   <h3>Field data</h3>
   <ul id="field-src" class="src"></ul>
 </section>

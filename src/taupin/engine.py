@@ -103,4 +103,5 @@ ROTATIONS = {
     "A_continuous_corn": ["corn"] * 5,
     "B_corn_soy_wheat": ["corn", "soybean", "wheat", "corn", "soybean"],
     "C_with_buckwheat": ["corn", "buckwheat", "soybean", "wheat", "corn"],
+    "D_corn_soy": ["corn", "soybean", "corn", "soybean", "corn"],
 }

@@ -20,7 +20,7 @@ def test_single_factor_never_supports_prescription():
 
 
 def test_high_om_pocket_counts():
-    assert [count(POCKET, k) for k in ROTATIONS] == [5, 2, 1]
+    assert [count(POCKET, k) for k in ROTATIONS] == [5, 2, 1, 2]   # D: corn in years 1, 3, 5
 
 
 def test_buckwheat_is_not_a_prescription_crop():

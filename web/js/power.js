@@ -109,10 +109,33 @@ export function liveFieldRisk(p, base, site) {
 }
 
 // One request. Resolves to { site, soil, fr }; rejects with a message the page can show.
+// GPM IMERG rain and air temperature for the soil and water columns (web/js/soilwater.js), full
+// years 2001 to 2025. POWER serves IMERG_PRECTOT only in UTC days; in local solar time every
+// value is the fill value.
+export const WEATHER_YEARS = [2001, 2025];
+export function weatherURL({ lat, lon }) {
+  const q = new URLSearchParams({ parameters: 'IMERG_PRECTOT,T2M_MAX,T2M_MIN', community: 'AG', longitude: lon, latitude: lat,
+    start: `${WEATHER_YEARS[0]}0101`, end: `${WEATHER_YEARS[1]}1231`, format: 'JSON', 'time-standard': 'UTC' });
+  return `https://power.larc.nasa.gov/api/temporal/daily/point?${q}`;
+}
+
+// POWER parameters -> the weather.json shape: one value per day from 1 Jan of the first year.
+export function weatherFrom(p, site, sources) {
+  const keys = Object.keys(p?.IMERG_PRECTOT ?? {}).sort();
+  if (!keys.length) return null;
+  const val = (k, d) => { const v = p[k]?.[d]; return v == null || v <= -998 ? null : Math.round(v * 10) / 10; };
+  const w = { site, start: `${keys[0].slice(0, 4)}-${keys[0].slice(4, 6)}-${keys[0].slice(6)}`,
+    rain: keys.map(d => val('IMERG_PRECTOT', d)), tmax: keys.map(d => val('T2M_MAX', d)), tmin: keys.map(d => val('T2M_MIN', d)), sources };
+  return w.rain.filter(v => v != null).length > 0.9 * keys.length ? w : null;
+}
+
 export async function fetchField(site, demo, { fetch = globalThis.fetch, now = new Date() } = {}) {
-  const res = await fetch(powerURL(site, now));
+  const [res, wres] = await Promise.all([fetch(powerURL(site, now)), fetch(weatherURL(site)).catch(() => null)]);
   if (!res.ok) throw new Error(`NASA POWER answered ${res.status}`);
   const j = await res.json(), p = j?.properties?.parameter;
   if (!p?.TSOIL1) throw new Error('NASA POWER returned no data for this place');
-  return { site, soil: liveSoil(p.TSOIL1, demo.soil.sources), fr: liveFieldRisk(p, demo.fieldRisk, site) };
+  // The water columns are a second request; if it fails the field still gets its dates and ranking.
+  let weather = null;
+  if (wres?.ok) try { weather = weatherFrom((await wres.json())?.properties?.parameter, site, demo.weather?.sources); } catch { /* bad JSON: no weather */ }
+  return { site, soil: liveSoil(p.TSOIL1, demo.soil.sources), fr: liveFieldRisk(p, demo.fieldRisk, site), weather };
 }

@@ -1,0 +1,66 @@
+{
+  "note": "Per-crop values for the soil and water columns (web/js/soilwater.js). null means no source was found; the app lists it as an information gap.",
+  "sources": {
+    "FAO56_T12": "Allen et al. 1998, FAO Irrigation and Drainage Paper 56, Table 12 (single crop coefficients Kc), fao.org/4/x0490e/x0490e0b.htm",
+    "FAO56_T11": "FAO-56 Table 11 (lengths of crop development stages)",
+    "FAO56_PLANT": "FAO-56 Ch. 6: spring wheat is sown when the 10-day running mean air temperature reaches 5 C, maize when it reaches 13 C",
+    "FAO56_ET0": "FAO-56 Eq. 52 (Hargreaves ET0) and Eq. 21 (extraterrestrial radiation)",
+    "OMAFRA_USLE": "OMAFRA Factsheet 23-005, Universal Soil Loss Equation (2023), Table 4 crop type factor and Table 5 tillage factor",
+    "CRAAQ_N": "Nitrogen grid for grain corn by climate zone (CPVQ 1996, Agri-Reseau feuillet 4B); same rates in the CRAAQ fertilization guide",
+    "MAPAQ_WHEAT_N": "MAPAQ, Grilles de reference ble, orge, avoine: spring wheat 120 kg N/ha, 90 kg N/ha on G1 soils with more than 4 % organic matter",
+    "CRAAQ_SOY_N": "CRAAQ fertilization guide via La Terre de chez nous (2018): soybean 0 to 30 kg N/ha",
+    "SOY_CREDIT": "CRAAQ 2010 soybean credit of 25 kg N/ha to the next crop, cited by N'Dayegamiye et al. 2012, Sustainable Agriculture Research 1(2):257, doi 10.5539/sar.v1n2p257 (they measured 31 to 42)",
+    "CPVQ_CREDIT": "CPVQ residue credit table (Agri-Reseau feuillet 4B): grain corn 0, spring wheat 0",
+    "LAL_RATIO": "Lal 2005, World crop residues production and implications of its use as a biofuel, Environment International 31:575, residue to grain ratios (Lal 1995 column)",
+    "CGQ_YIELD": "Concertation Grains Quebec (2025), mean Quebec yields 1981 to 2023"
+  },
+  "crops": {
+    "corn": {
+      "name": "Grain corn",
+      "kc": [0.3, 1.2, 0.35], "kc_src": "FAO56_T12",
+      "stages": [30, 40, 50, 50], "stages_src": "FAO56_T11", "stages_note": "Idaho, USA, the cool-climate row",
+      "plant_t10": 13, "plant_src": "FAO56_PLANT",
+      "usle_crop": 0.40, "usle_src": "OMAFRA_USLE",
+      "n_need": [120, 170], "n_src": "CRAAQ_N",
+      "n_credit_next": 0, "credit_src": "CPVQ_CREDIT",
+      "yield_kg_ha": 7656, "yield_src": "CGQ_YIELD",
+      "residue_ratio": 1.0, "ratio_src": "LAL_RATIO"
+    },
+    "soybean": {
+      "name": "Soybean",
+      "kc": [0.4, 1.15, 0.5], "kc_src": "FAO56_T12", "kc_note": "the initial value 0.4 is the FAO-56 legume group value, assumed for soybean",
+      "stages": [20, 35, 60, 25], "stages_src": "FAO56_T11", "stages_note": "Central USA, May sowing",
+      "plant_t10": 13, "plant_src": null, "plant_note": "assumption: sown with the maize rule; FAO-56 gives no soybean rule",
+      "usle_crop": 0.50, "usle_src": "OMAFRA_USLE",
+      "n_need": [0, 30], "n_src": "CRAAQ_SOY_N",
+      "n_credit_next": 25, "credit_src": "SOY_CREDIT",
+      "yield_kg_ha": 2759, "yield_src": "CGQ_YIELD",
+      "residue_ratio": 1.0, "ratio_src": "LAL_RATIO"
+    },
+    "wheat": {
+      "name": "Spring wheat",
+      "kc": [0.3, 1.15, 0.3], "kc_src": "FAO56_T12", "kc_note": "end value 0.25 to 0.4 in FAO-56; 0.3 used",
+      "stages": [20, 25, 60, 30], "stages_src": "FAO56_T11", "stages_note": "sown March or April at 35 to 45 degrees latitude",
+      "plant_t10": 5, "plant_src": "FAO56_PLANT",
+      "usle_crop": 0.35, "usle_src": "OMAFRA_USLE",
+      "n_need": [90, 120], "n_src": "MAPAQ_WHEAT_N",
+      "n_credit_next": 0, "credit_src": "CPVQ_CREDIT",
+      "yield_kg_ha": 3035, "yield_src": "CGQ_YIELD",
+      "residue_ratio": 1.5, "ratio_src": "LAL_RATIO"
+    },
+    "buckwheat": {
+      "name": "Buckwheat",
+      "kc": null, "kc_src": null, "kc_note": "buckwheat is not in FAO-56 Table 12",
+      "stages": null, "stages_src": null,
+      "plant_t10": null, "plant_src": null,
+      "usle_crop": 0.35, "usle_src": "OMAFRA_USLE", "usle_note": "assumption: counted as a cereal; OMAFRA Table 4 has no buckwheat row",
+      "n_need": null, "n_src": null,
+      "n_credit_next": null, "credit_src": null,
+      "yield_kg_ha": null, "yield_src": null,
+      "residue_ratio": null, "ratio_src": null
+    }
+  },
+  "tillage": {"fall_plow": 1.0, "spring_plow": 0.9, "mulch": 0.6, "no_till": 0.25, "src": "OMAFRA_USLE"},
+  "heavy_rain_mm": 25,
+  "heavy_rain_note": "a day with 25 mm or more of rain, above 0 C, April to November; the cut-off is this tool's choice, not a published threshold"
+}

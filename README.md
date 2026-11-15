@@ -5,7 +5,8 @@
 Taupin helps a Quebec grain farmer and their agronomist scout a field for wireworms before buying
 insecticide-coated seed. It dates the bait-trap week from NASA POWER soil temperature, places the
 traps on a 3D field built from lidar, NASA HLS, Landsat and the soil map, takes the counts, names a
-soil insect from a photo, and compares pest levels for three crop rotations over five years. It
+soil insect from a photo, and compares four crop rotations over five years for water, soil loss,
+nitrogen, crop residue and pests, with NASA GPM rain and SMAP soil moisture. It
 runs in the browser, offline; photos and counts never leave the device.
 
 Built for NASA Space Apps 2026. Taupin is French for wireworm and click beetle.
@@ -43,8 +44,9 @@ How Taupin answers the challenge and its judging criteria: [`docs/CHALLENGE_FIT.
 - **Your own field.** Enter a latitude and longitude, or use the device's position. The page asks
   NASA POWER for soil temperature and root-zone wetness at that point and shows the trap date, the
   date for each year since 1995 and the field's rank. Only the two coordinates leave the device,
-  and the answer is kept for use without a network. The 3D field, the trap points and the rotation
-  table stay the demo square.
+  and the answer is kept for use without a network. It also asks for daily NASA GPM IMERG rain and air
+  temperature, so the water columns of the rotation table are the field's own. The 3D field, the trap
+  points and the pest levels stay the demo square.
 - **Count.** A sheet for three lifts per trap. Each lift is compared on its own with the threshold
   of the dominant species (3 per trap for *Hypnoidus abbreviatus*, 1 for *Agriotes*, *Limonius*
   and *Melanotus*; RAP Grandes cultures, Agri-Réseau doc. 115269).
@@ -55,8 +57,14 @@ How Taupin answers the challenge and its judging criteria: [`docs/CHALLENGE_FIT.
   photo's GPS if you choose that, only on that tap. Finds stay in the browser, show as pins on the
   field when they fall in the demo square, go into the agronomist record and export as CSV and
   GeoJSON. The latest find fills in the coordinates for "Your field". "Delete all finds" clears them.
-- **Plan.** Wireworm and corn rootworm levels for 2026 to 2030 under corn every year,
-  corn-soybean-wheat, and a rotation with buckwheat. Each level lists its reasons with a source.
+- **Plan.** Four rotations for 2026 to 2030: corn every year, corn and soybean (marked as current;
+  the farmer can mark another), corn-soybean-wheat, and a rotation with buckwheat. Each gets the
+  dry-year water shortfall (GPM IMERG rain against FAO-56 crop water need), heavy-rain days on bare
+  soil, the USLE cover factor for the chosen tillage (OMAFRA 23-005), nitrogen to buy (CRAAQ, MAPAQ),
+  crop residue returned (Lal 2005) and wireworm and corn rootworm levels. The farmer ticks what
+  matters and the rotations are ranked on those. Each rotation card gives why it is there, the
+  evidence, gains and losses against the current rotation, the information gaps and the risks. A
+  value with no source shows as ? and is never counted as zero.
 - **Hand over.** Trap points as GPX, CSV and GeoJSON, and a text record with the trap date, the
   counts, the ranking and the photos, for the agronomist. Taupin never decides the prescription.
   The agronomist signs.
@@ -103,6 +111,8 @@ flowchart LR
     HLS[HLS NDVI, Landsat spring surface temperature] --> F
     IRDA[IRDA soil map + CanSIS tables] --> F
     POWER[NASA POWER TSOIL1 daily] --> S[web/data/soil.json]
+    IMERG[GPM IMERG rain + POWER T2M via POWER] --> W[web/data/weather.json]
+    SMAP[SMAP L4 root-zone soil moisture via GIBS] --> SM[web/data/smap.json]
     ENG[src/taupin/engine.py rules + sources] --> R[web/data/risk.json]
   end
   subgraph train["train/ (model/ outputs)"]
@@ -166,6 +176,8 @@ Class counts, the threshold table and the split method are in `model/MODEL_CARD.
 | Data | Use | Licence |
 |---|---|---|
 | NASA POWER daily point API (MERRA-2): `TSOIL1`, `GWETROOT` | trap date; two inputs of the field risk model | NASA open data |
+| NASA GPM IMERG daily rain via NASA POWER (`IMERG_PRECTOT`), with `T2M_MAX`, `T2M_MIN`, 2001 to 2025 | rotation water need, rain, heavy-rain days on bare soil | NASA open data |
+| NASA SMAP L4 analysed root-zone soil moisture via GIBS, April 2015 to September 2025 | check of the POWER wetness input; soil moisture chart | NASA open data |
 | NASA HLS v2.0 (L30 and S30), 23 clear summer scenes, 2020 to 2025 | vegetation layer (NDVI) | NASA open data |
 | USGS Landsat 8/9 Collection 2 Level-2, 46 clear April and May scenes, 2016 to 2025 | spring surface temperature layer | public domain |
 | NRCan HRDEM lidar, 1 m, 2023 | relief, canopy height, slope, wetness index | Open Government Licence - Canada |
@@ -178,6 +190,7 @@ Class counts, the threshold table and the split method are in `model/MODEL_CARD.
 | MAPAQ / RAP, Agri-Réseau doc. 118135 | corn rootworm rules | cited |
 | Saguez et al. 2017, doi:10.1093/ee/nvx116; Noronha et al. 2023, doi:10.1007/s11829-023-09982-9 | wireworm factors | cited |
 | Code de gestion des pesticides, D. 470-2025 | prescription rule | cited |
+| FAO-56 (Allen et al. 1998); OMAFRA Factsheet 23-005; CRAAQ and MAPAQ nitrogen grids; Lal 2005; Concertation Grains Québec yields | crop water need, USLE cover factor, nitrogen, residue (`web/data/crops.json`) | cited |
 
 `DATA_SOURCES.md` lists every layer with its source, licence, native resolution and access date.
 

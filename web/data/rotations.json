@@ -1,0 +1,60 @@
+{
+  "note": "Text for the rotation cards. Benefits are not written here: the app computes them against the rotation the user marks as current (web/js/soilwater.js versus()).",
+  "default_current": "D_corn_soy",
+  "rotations": {
+    "A_continuous_corn": {
+      "why": "The baseline: what the field gives if nothing changes. Grain corn every year is the simplest plan to run and to market.",
+      "evidence": [
+        "Corn after corn keeps rootworm eggs laid this year hatching under next year's corn [MAPAQ / RAP fiche chrysomèle des racines du maïs]",
+        "Grass crops sustain wireworm populations, and corn is a grass [Saguez et al. 2017]",
+        "Grain corn has the USLE crop type factor 0.40 [OMAFRA Factsheet 23-005]"
+      ],
+      "risks": [
+        "Rootworm and wireworm pressure stays, so coated seed is more likely to be needed",
+        "The highest nitrogen bill of the four plans, every year",
+        "Bare soil from harvest in November to crop cover the next June"
+      ],
+      "gaps": ["No yield penalty for corn after corn is counted; the yield is the Quebec mean for all corn"]
+    },
+    "B_corn_soy_wheat": {
+      "why": "A three-crop rotation: a legume and a small grain break the corn cycle, and wheat covers the soil from April.",
+      "evidence": [
+        "One year out of corn breaks the rootworm cycle [MAPAQ / RAP fiche chrysomèle des racines du maïs]",
+        "Soybean leaves about 25 kg N/ha to the next crop [CRAAQ 2010, cited by N'Dayegamiye et al. 2012]",
+        "Spring wheat is sown when the 10-day mean air temperature reaches 5 C, about five weeks before corn [FAO-56 Ch. 6]",
+        "Wheat straw: 1.5 t of residue per t of grain [Lal 2005]"
+      ],
+      "risks": [
+        "Wheat is a grass, so wireworms are not starved in the wheat year [Saguez et al. 2017]",
+        "Wheat finishes in late summer, when a dry July can cut the yield: see the dry-year shortfall",
+        "Three crops to market instead of one or two"
+      ],
+      "gaps": ["No cover crop after wheat is counted; one would cut the bare-soil days further"]
+    },
+    "C_with_buckwheat": {
+      "why": "Adds buckwheat, which slows wireworm larvae, before soybean and wheat: the plan aimed most directly at the pest.",
+      "evidence": [
+        "Wireworm larvae survived 15 % on buckwheat against 44 % on barley over 120 days [Noronha et al. 2023]",
+        "One year out of corn breaks the rootworm cycle [MAPAQ / RAP fiche chrysomèle des racines du maïs]"
+      ],
+      "risks": [
+        "Buckwheat is a niche market in Quebec; the price and the buyer must be found first",
+        "Buckwheat is not a biofumigant: it slows larvae, it does not kill them [Noronha et al. 2023]"
+      ],
+      "gaps": ["FAO-56 gives no crop coefficient for buckwheat, so its water use is not computed"]
+    },
+    "D_corn_soy": {
+      "why": "A two-crop plan: corn and soybean in turn. Marked as the current rotation by default; mark your own.",
+      "evidence": [
+        "One year out of corn breaks the rootworm cycle [MAPAQ / RAP fiche chrysomèle des racines du maïs]",
+        "Soybean leaves about 25 kg N/ha to the next corn [CRAAQ 2010, cited by N'Dayegamiye et al. 2012]",
+        "Soybean has the USLE crop type factor 0.50, higher than corn's 0.40: less residue to cover the soil [OMAFRA Factsheet 23-005]"
+      ],
+      "risks": [
+        "A rootworm variant in the US Corn Belt lays eggs in soybean, which undoes the one-year break; whether it is in Quebec is not checked here",
+        "Soybean leaves little residue, so the soil is barer in the soybean years"
+      ],
+      "gaps": ["How common this rotation is in Quebec was not checked against a census figure"]
+    }
+  }
+}

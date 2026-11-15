@@ -8,6 +8,7 @@ export const ROTATION_NAMES = {
   A_continuous_corn: 'Corn every year',
   B_corn_soy_wheat: 'Corn, soybean, wheat',
   C_with_buckwheat: 'With buckwheat',
+  D_corn_soy: 'Corn and soybean',
 };
 export const CROP_SHORT = { soybean: 'soy', buckwheat: 'buckw.' };
 
@@ -53,6 +54,7 @@ export function riskView(risk, zone, evidence = []) {
     }),
   }));
   return { zone, label: z.label, genus: z.dominant_genus, threshold: z.trap_threshold, rows, ww, crw,
+    cells: rows.length * rows[0].years.length,
     rxCount: rows.reduce((n, r) => n + r.years.filter(y => y.rx).length, 0),
     rxIfTrap: rows.reduce((n, r) => n + r.years.filter(y => (y.ifTrap ? y.ifTrap.rx : y.rx)).length, 0) };
 }

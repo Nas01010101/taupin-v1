@@ -41,6 +41,39 @@ GWETROOT is not spread inside the field with the wetness index: the model was fi
 fields, and no source gives how much spring wetness varies inside one field, so any spread would
 be an invented number.
 
+## NASA GPM IMERG rain and SMAP soil moisture
+
+| Item | Source | Licence | Native resolution | Feeds |
+|---|---|---|---|---|
+| Daily rain, 2001 to 2025, `web/data/weather.json` (`src/taupin/weather.py`) | NASA GPM IMERG daily precipitation through the NASA POWER daily point API, parameter `IMERG_PRECTOT`, requested with `time-standard=UTC` (with the default local solar time every value is the fill value -999) | NASA open data | 0.1 degree | Rain over each crop's season, dry-year water shortfall, heavy-rain days on bare soil (`web/js/soilwater.js`) |
+| Daily air temperature, 2001 to 2025, same file | NASA POWER `T2M_MAX`, `T2M_MIN` (MERRA-2) | NASA open data | 0.5 x 0.625 degree | Hargreaves reference evapotranspiration; sowing day from the 10-day mean air temperature |
+| Root-zone soil moisture, 252 dates (1st and 15th of each month, April 2015 to September 2025), `web/data/smap.json` (`src/taupin/smap.py`) | NASA SMAP L4 analysed root-zone soil moisture (0 to 100 cm), GIBS WMS layer `SMAP_L4_Analyzed_Root_Zone_Soil_Moisture`, decoded with the GIBS colour map (bins of 0.003 m3/m3); no login | NASA open data | 9 km | Check of the POWER `GWETROOT` ranking input: monthly anomalies correlate at r = 0.78 over 126 months; soil moisture chart under "Details" |
+
+SMAP L4 masks Montreal island at the field itself, so each value is the median of the valid cells
+within 0.2 degree of the field (a box of about 45 km, close to the POWER cell). For "Your field" the
+browser asks POWER for `IMERG_PRECTOT`, `T2M_MAX` and `T2M_MIN` at the entered coordinates
+(`web/js/power.js` `weatherURL`); SMAP is shown for the demo field only.
+
+## Crop, soil-loss and nitrogen values
+
+`web/data/crops.json` gives each value a source key:
+
+| Key | Source | Feeds |
+|---|---|---|
+| FAO56_T12, FAO56_T11 | Allen et al. 1998, FAO Irrigation and Drainage Paper 56, Table 12 (crop coefficients) and Table 11 (stage lengths) | Crop water need |
+| FAO56_PLANT | FAO-56 Ch. 6: spring wheat sown when the 10-day mean air temperature reaches 5 C, maize at 13 C | Sowing day |
+| FAO56_ET0 | FAO-56 Eq. 52 (Hargreaves) and Eq. 21 (extraterrestrial radiation) | Reference evapotranspiration |
+| OMAFRA_USLE | OMAFRA Factsheet 23-005, Universal Soil Loss Equation (2023), Table 4 crop type factor, Table 5 tillage factor | USLE cover factor C |
+| CRAAQ_N, MAPAQ_WHEAT_N, CRAAQ_SOY_N | CPVQ 1996 nitrogen grid for grain corn (Agri-Réseau feuillet 4B, same rates in the CRAAQ guide); MAPAQ reference grid for spring wheat; CRAAQ soybean rate | Nitrogen to buy |
+| SOY_CREDIT, CPVQ_CREDIT | CRAAQ 2010 soybean credit of 25 kg N/ha, cited by N'Dayegamiye et al. 2012, doi:10.5539/sar.v1n2p257; CPVQ residue credit table | Nitrogen credit to the next crop |
+| LAL_RATIO | Lal 2005, Environment International 31:575, residue to grain ratios | Crop residue returned |
+| CGQ_YIELD | Concertation Grains Québec (2025), mean Quebec yields 1981 to 2023 | Grain yield behind the residue |
+
+Taupin choices with no source: a heavy-rain day is 25 mm or more, April to November, above 0 C
+mean air temperature; the soil counts as bare before the end of the FAO-56 initial stage and after
+harvest; the dry year is the 1-in-5 worst season; priorities have equal weight. Buckwheat has no
+FAO-56 coefficient, Quebec nitrogen rate or CGQ yield, so its years show ? and are not counted.
+
 ## Field layers
 
 Baked by `src/taupin/layers.py` into `web/data/field.json` (manifest) and `web/data/layers/*.bin`
