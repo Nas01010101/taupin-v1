@@ -17,7 +17,7 @@ export function resultHTML(st) {
   if (st.kind === 'error') return `<p class="bad"><strong>Could not classify.</strong> ${esc(st.message)}</p>`;
   const d = st.decision, top = d.top.slice(1).map(t => `${esc(t.name)} ${pct(t.prob)}`).join(', ');
   const head = d.unclear
-    ? `<p class="answer unclear">${esc(UNCLEAR)}</p><p class="muted">Best guess ${esc(d.name)} at ${pct(d.prob)}, below the ${pct(st.abstain)} the model card sets for an answer.</p>`
+    ? `<p class="answer unclear">${esc(UNCLEAR)}</p><p class="muted">Best guess ${esc(d.name)} at ${pct(d.prob)}, below the ${pct(st.abstain)} needed for an answer.</p>`
     : `<p class="answer${d.pest ? ' pest' : ''}">${esc(d.name)} <span class="prob">${pct(d.prob)}</span></p>`;
   return `<div class="result">${st.thumb ? `<img src="${esc(st.thumb)}" alt="" width="72" height="72">` : ''}<div>${head}` +
     (top ? `<p class="top3">Next: ${top}</p>` : '') + `</div></div>` +
@@ -192,6 +192,7 @@ export function trapsHTML(field, sheet = {}) {
   return `<p class="small">${esc(field.traps.length)} traps, lettered as flags A to J, closest pair ${esc(r.min_spacing_here_m)} m apart. `
     + 'Scouting zones are classes of the layers above (wetness index, vegetation, spring surface temperature, soil). '
     + 'They spread the traps over the field\'s variability. They are not a risk map: the model gives one rank for the whole field.</p>'
+    + '<h3 id="h-counts">4. Enter the counts</h3><p class="small">At each lift, type the wireworms found in each trap.</p>'
     + `<div class="table-wrap"><table class="traps"><thead><tr><th>Trap</th><th>Zone</th><th>Latitude</th><th>Longitude</th>`
     + `${lifts.map(i => `<th>Lift ${i + 1}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`
     + countFormHTML(sheet) + '<div id="count-result" aria-live="polite"></div>'

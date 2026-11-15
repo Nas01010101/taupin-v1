@@ -198,3 +198,15 @@ details.more summary { cursor: pointer; padding: var(--s1) 0; }
 .files { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1); margin-top: var(--s2); }
 #record { white-space: pre; overflow-x: auto; padding: var(--s3); border-radius: var(--r); background: var(--surface); color: var(--fg); font-size: var(--t-xs); font-variant-numeric: tabular-nums; }
 .lab ol { margin: var(--s1) 0; padding-left: var(--s4); }
+
+/* Farmer task flow: six numbered steps on the first screen. The demo keeps its own layout. */
+.flow { padding: var(--s4) var(--s5) var(--s5); }
+.flow h2 { margin: 0 0 var(--s1); }
+.flow ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: var(--s2) var(--s4); margin: var(--s3) 0 0; padding-left: var(--s5); }
+.flow a { color: inherit; }
+.demo .flow { display: none; }
+.demo #identify { order: -1; }
+.finds { margin: var(--s2) 0; padding-left: var(--s4); }
+#find-status:empty { display: none; }
+@media (max-width: 900px) { .flow { padding: var(--s3); } }
+[hidden] { display: none !important; }

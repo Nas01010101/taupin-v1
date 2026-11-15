@@ -9,6 +9,7 @@ import { fieldRanking } from './fieldrisk.js';
 import { parseCoords, coordText, fetchField } from './power.js';
 import { formatAnswer } from './classify.js';
 import * as scout from './scout.js';
+import * as finds from './finds.js';
 import * as ui from './ui.js';
 
 const $ = s => document.querySelector(s);
@@ -27,6 +28,8 @@ function loadSheet() {
 }
 const sheet = loadSheet();
 const DEMO_RUN = new URLSearchParams(location.search).has('demo');   // the recorded demo always uses the baked field
+const store = (() => { try { return localStorage; } catch { return null; } })();   // null when site data is blocked
+state.finds = DEMO_RUN ? [] : finds.loadFinds(store);   // saved finds stay on this device
 const today = () => new Date().toLocaleDateString('en-CA');   // YYYY-MM-DD in local time
 
 // The demo square has no light soil; for another field the farmer ticks the box.
@@ -36,7 +39,7 @@ function recordNow() {
   const r = rankNow();
   return scout.recordText({ date: today(), field: D.field, window: trapWindow(D.soil), sheet, own: state.own && coordText(state.own),
     rank: r && { text: ui.RANK_TEXT[r.rank], year: r.year, n: D.model.metrics.n },
-    photos: state.evidence.map(e => `${formatAnswer(e.decision)}, ${e.zoneLabel}`) });
+    photos: state.evidence.map(e => `${formatAnswer(e.decision)}, ${e.zoneLabel}`), finds: state.finds });
 }
 
 function renderCounts() {
@@ -61,7 +64,7 @@ function zoneOf(cell) { return cell && scene.isPocket(cell.row, cell.col) ? 'poc
 
 function renderModelStatus() {
   const m = state.model, el = $('#model-status');
-  const text = { loading: 'Loading model…', ready: `Model ready, ${m.labels?.classes.length} classes`, missing: 'Model not installed', error: 'Model failed to load' }[m.status];
+  const text = { loading: 'Loading the photo check…', ready: 'Photo check ready', missing: 'Photo check not installed', error: 'Photo check failed to load' }[m.status];
   el.textContent = text; el.dataset.status = m.status;
   if (m.reason) el.title = m.reason;
   $('#model-metrics').innerHTML = m.status !== 'ready' ? ''
@@ -106,7 +109,7 @@ async function loadOwn(site) {
 
 function renderRank() {
   const r = rankNow();
-  $('#h-rank').textContent = r ? `${ui.RANK_TEXT[r.rank]} wireworm ranking for ${r.year}` : 'Field wireworm ranking';
+  $('#h-rank').textContent = r ? `Which fields to trap first: ${ui.RANK_TEXT[r.rank].toLowerCase()} third for ${r.year}` : 'Which fields to trap first';
   $('#rank').innerHTML = ui.fieldRankHTML(r, D.model, { lightSoilNote: state.own ? OWN_SOIL_NOTE : LIGHT_SOIL_NOTE });
   $('#record').textContent = recordNow();
 }
@@ -119,7 +122,7 @@ function renderPanel() {
   $('#risk-table').innerHTML = ui.riskTableHTML(view, state.sel);
   $('#trace').innerHTML = ui.traceHTML(view, state.sel);
   const tw = trapWindow(D.soil);
-  $('#h-trap').textContent = `Set bait traps around ${tw.mean12}`;
+  $('#h-trap').textContent = `2. Trap week: set bait traps around ${tw.mean12}`;
   $('#trap-lede').textContent = `The week the top 10 cm of soil reaches 12 °C. NASA POWER, mean of ${tw.span[0]}-${tw.span[1]}${state.own ? ` at ${coordText(state.own)}` : ''}.`;
   $('#trap').innerHTML = ui.trapHTML(tw, D.soil, state.evidence);
   $('#evidence').innerHTML = ui.evidenceHTML(state.evidence);
@@ -150,6 +153,7 @@ export async function ingest(blob, name, cell = null, { dropMs = 700 } = {}) {
     const effect = effectFor(decision);
     const where = cell ?? { row: Math.floor(scene.size / 2), col: Math.floor(scene.size / 2) };
     const entry = { decision, effect, thumb: px.thumb, cell: where, name };
+    state.lastBlob = blob;
     state.current = { kind: 'result', decision, effect, thumb: px.thumb, abstain: Number(state.model.labels.abstain_below ?? 0) };
     if (!decision.unclear) {
       entry.pin = scene.addPin({ row: where.row, col: where.col, thumb: px.thumb, color: PIN[effect.kind], drop: dropMs ? 0 : 1 });
@@ -157,7 +161,7 @@ export async function ingest(blob, name, cell = null, { dropMs = 700 } = {}) {
       state.evidence.push(entry);
       place(entry, where);
     }
-    renderPanel();
+    renderPanel(); renderFinds();
     return entry;
   } catch (e) {
     state.current = { kind: 'error', message: e.message }; renderPanel();
@@ -181,7 +185,46 @@ function place(entry, cell) {
 
 function rebuildPins() {
   scene.clearPins();
+  for (const f of finds.splitFinds(D.field, state.finds).inside)
+    scene.addPin({ row: f.cell.row, col: f.cell.col, color: f.answered_or_unclear === 'unclear' ? PIN.unclear : PIN.wireworm });
   for (const e of state.evidence) e.pin = scene.addPin({ row: e.cell.row, col: e.cell.col, thumb: e.thumb, color: PIN[e.effect.kind] });
+}
+
+// Finds: saved only on the farmer's tap, kept in this browser, never uploaded.
+function renderFinds() {
+  const split = finds.splitFinds(D.field, state.finds);
+  $('#finds').innerHTML = finds.findsHTML({ canSave: state.current.kind === 'result' && !DEMO_RUN, finds: state.finds, ...split });
+  $('#record').textContent = recordNow();
+}
+const findStatus = t => { $('#find-status').textContent = t; };
+
+function saveFind(pos) {
+  const f = finds.makeFind(pos, state.current.decision, { count: $('#find-count')?.value });
+  if (!f) { findStatus('No position to save.'); return; }
+  state.finds.push(f);
+  const kept = finds.saveFinds(store, state.finds);
+  if (!state.own) { $('#own-lat').value = finds.latestSite(state.finds).lat; $('#own-lon').value = finds.latestSite(state.finds).lon; }
+  rebuildPins(); renderFinds();
+  findStatus(`${kept ? 'Saved on this device' : 'Kept for this visit only: this browser blocks storage'}: ${scout.findLine(f)}. `
+    + (finds.cellOf(D.field, f.lat, f.lon) ? 'It is pinned on the field.' : 'It is outside the demo square, so it is listed below.')
+    + (state.own ? '' : ' Its position is filled in under step 1 for the NASA dates.'));
+}
+
+async function onFindClick(kind) {
+  if (kind === 'device') {
+    if (!navigator.geolocation) { findStatus('This browser gives no position.'); return; }
+    findStatus('Reading the position…');
+    navigator.geolocation.getCurrentPosition(
+      p => saveFind({ lat: p.coords.latitude, lon: p.coords.longitude, accuracy_m: p.coords.accuracy, source: 'device' }),
+      () => findStatus('The position was refused or not available. Nothing was saved.'), { enableHighAccuracy: true, timeout: 20000 });
+  } else if (kind === 'photo') {
+    const gps = state.lastBlob ? finds.exifGPS(await state.lastBlob.arrayBuffer()) : null;
+    if (gps) saveFind({ ...gps, accuracy_m: null, source: 'photo' }); else findStatus('This photo has no GPS position. Nothing was saved.');
+  } else if (kind === 'csv') saveFile('taupin-finds.csv', finds.findsCSV(state.finds), 'text/csv');
+  else if (kind === 'geojson') saveFile('taupin-finds.geojson', finds.findsGeoJSON(state.finds), 'application/geo+json');
+  else if (kind === 'delete' && confirm(`Delete all ${state.finds.length} finds from this device?`)) {
+    state.finds = []; finds.clearFinds(store); rebuildPins(); renderFinds(); findStatus('All finds deleted from this device.');
+  }
 }
 
 function bind() {
@@ -210,6 +253,7 @@ function bind() {
     const b = e.target.closest('[data-remove]'); if (!b) return;
     state.evidence.splice(Number(b.dataset.remove), 1); rebuildPins(); renderPanel();
   });
+  $('#finds').addEventListener('click', e => { const b = e.target.closest('[data-find]'); if (b) onFindClick(b.dataset.find); });
   $('#rank-year').addEventListener('change', e => { state.rankYear = e.target.value; renderRank(); });
   $('#rank-light').addEventListener('change', e => { state.light = e.target.checked; renderRank(); });
   $('#own').addEventListener('submit', e => { e.preventDefault(); loadOwn(parseCoords($('#own-lat').value, $('#own-lon').value)); });
@@ -276,7 +320,10 @@ async function main() {
   // A field fetched earlier comes back from this device's storage, so it also opens with no network.
   let own = null;
   if (!DEMO_RUN) try { own = JSON.parse(localStorage.getItem(OWN_KEY)); } catch { /* blocked or bad JSON: demo field */ }
-  if (own?.site) { $('#own-lat').value = own.site.lat; $('#own-lon').value = own.site.lon; }
+  const last = finds.latestSite(state.finds), def = own?.site ?? last;   // the latest find is the default field position
+  if (def) { $('#own-lat').value = def.lat; $('#own-lon').value = def.lon; }
+  if (state.finds.length) scene.ready.then(rebuildPins);
+  renderFinds();
   useField(own?.soil && own?.fr ? own : null);
   renderCounts();
   renderModelStatus();

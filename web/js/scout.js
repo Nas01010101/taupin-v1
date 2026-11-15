@@ -82,8 +82,16 @@ export function trapsGeoJSON(field, sheet) {
   })) }, null, 1) + '\n';
 }
 
+// One saved find as a line of text: time, what the photo showed, where, how sure the position is.
+export function findLine(f) {
+  const ns = f.lat >= 0 ? 'N' : 'S', ew = f.lon >= 0 ? 'E' : 'W';
+  const what = f.answered_or_unclear === 'unclear' ? `unclear (best guess ${f.label}, ${(100 * f.confidence).toFixed(1)} %)` : `${f.label} (${(100 * f.confidence).toFixed(1)} %)`;
+  return `${String(f.time).slice(0, 16).replace('T', ' ')} UTC, ${what}, ${Math.abs(f.lat).toFixed(5)} ${ns}, ${Math.abs(f.lon).toFixed(5)} ${ew}`
+    + `${f.accuracy_m != null ? ` (within ${f.accuracy_m} m)` : ''}${f.source === 'photo' ? ', from the photo GPS' : ''}${f.count != null ? `, ${f.count} found` : ''}`;
+}
+
 // Plain text the farmer hands to the agronomist. Every line is a value shown in the app.
-export function recordText({ date, field, window: tw, sheet, rank, photos = [], own = null }) {
+export function recordText({ date, field, window: tw, sheet, rank, photos = [], own = null, finds = [] }) {
   const r = field.trap_rules, s = liftSummary(field.traps, sheet), side = field.parcel.size * field.parcel.res_m;
   const pad = (v, n) => String(v).padEnd(n);
   const rows = field.traps.map(t => `  ${pad(t.id, 5)}${pad(t.zone, 5)}${pad(t.lat.toFixed(6), 11)}${pad(t.lon.toFixed(6), 12)}`
@@ -107,6 +115,8 @@ export function recordText({ date, field, window: tw, sheet, rank, photos = [], 
     'Photos named in the app',
     ...(photos.length ? photos.map(p => `  ${p}`) : ['  None.']),
     '  A photo is a first sort; the lab names the species.', '',
+    'Finds saved on this device',
+    ...(finds.length ? finds.map(f => `  ${findLine(f)}`) : ['  None.']), '',
     'Also',
     `  ${VFFQC}: the Quebec field-level wireworm risk tool. Three lifts are required to enter a field in it.`,
     `  ${LAB.name}, ${LAB.email}: species identification of the larvae.`, '',
