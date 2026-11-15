@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/assets/logo.svg" width="72" alt="Taupin logo: a click beetle"></p>
+<p align="center"><img src="docs/assets/logo.svg" width="160" alt="Taupin logo: a click beetle"></p>
 
 # Taupin
 
