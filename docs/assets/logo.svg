@@ -2,7 +2,7 @@
   <title>Taupin</title>
   <mask id="seam">
     <rect width="64" height="64" fill="#fff"/>
-    <path d="M32 34v25" stroke="#000" stroke-width="1.6"/>
+    <path d="M32 33v29" stroke="#000" stroke-width="1.6"/>
   </mask>
   <g fill="#14532d" stroke="#14532d" stroke-linecap="round" mask="url(#seam)">
     <path d="M29 9 24 3M35 9l5-6M22 23l-6-3M42 23l6-3M22 37l-7 2M42 37l7 2M23 47l-6 5M41 47l6 5" fill="none" stroke-width="2.4"/>
