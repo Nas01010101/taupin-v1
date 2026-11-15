@@ -1,0 +1,58 @@
+{
+ "classes": [
+  {
+   "id": "wireworm",
+   "name": "Wireworm (click beetle larva)",
+   "pest": true
+  },
+  {
+   "id": "click_beetle",
+   "name": "Click beetle (adult)",
+   "pest": true
+  },
+  {
+   "id": "corn_rootworm",
+   "name": "Corn rootworm beetle (adult)",
+   "pest": true
+  },
+  {
+   "id": "white_grub",
+   "name": "White grub (scarab larva)",
+   "pest": true
+  },
+  {
+   "id": "ground_beetle",
+   "name": "Ground beetle (beneficial)",
+   "pest": false
+  },
+  {
+   "id": "millipede",
+   "name": "Millipede (not an insect)",
+   "pest": false
+  },
+  {
+   "id": "earthworm",
+   "name": "Earthworm (beneficial)",
+   "pest": false
+  },
+  {
+   "id": "other",
+   "name": "Other soil animal or object",
+   "pest": false
+  }
+ ],
+ "input_size": 224,
+ "mean": [
+  0.485,
+  0.456,
+  0.406
+ ],
+ "std": [
+  0.229,
+  0.224,
+  0.225
+ ],
+ "temperature": 0.6900157637413609,
+ "abstain_below": 0.738004207611084,
+ "version": "v1-effb0"
+}

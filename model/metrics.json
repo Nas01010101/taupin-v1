@@ -1,0 +1,1544 @@
+{
+ "version": "v1-effb0",
+ "arch": "efficientnet_b0.ra_in1k",
+ "input_size": 224,
+ "classes": [
+  "wireworm",
+  "click_beetle",
+  "corn_rootworm",
+  "white_grub",
+  "ground_beetle",
+  "millipede",
+  "earthworm",
+  "other"
+ ],
+ "temperature": 0.6900157637413609,
+ "abstain_below": 0.738004207611084,
+ "abstain_target_accuracy": 0.95,
+ "target_met_on_val": true,
+ "selected_epoch": 11,
+ "counts_per_split": {
+  "val": {
+   "wireworm": 61,
+   "click_beetle": 104,
+   "corn_rootworm": 120,
+   "white_grub": 114,
+   "ground_beetle": 178,
+   "millipede": 148,
+   "earthworm": 92,
+   "other": 159
+  },
+  "ood": {
+   "wireworm": 44,
+   "click_beetle": 83,
+   "corn_rootworm": 85,
+   "white_grub": 79,
+   "ground_beetle": 54,
+   "millipede": 19,
+   "earthworm": 12,
+   "other": 112
+  },
+  "test": {
+   "wireworm": 55,
+   "click_beetle": 87,
+   "corn_rootworm": 79,
+   "white_grub": 97,
+   "ground_beetle": 75,
+   "millipede": 76,
+   "earthworm": 83,
+   "other": 204
+  },
+  "train": {
+   "wireworm": 286,
+   "click_beetle": 493,
+   "corn_rootworm": 297,
+   "white_grub": 519,
+   "ground_beetle": 445,
+   "millipede": 457,
+   "earthworm": 522,
+   "other": 833
+  }
+ },
+ "ood_sources": {
+  "gbif": 369,
+  "wikimedia_commons": 119
+ },
+ "onnx": {
+  "opset": 17,
+  "bytes": 16045861,
+  "ops": [
+   "Add",
+   "Conv",
+   "Flatten",
+   "Gemm",
+   "GlobalAveragePool",
+   "Mul",
+   "ReduceMean",
+   "Sigmoid"
+  ],
+  "quantized_int8_matmul": false,
+  "max_abs_logit_diff_vs_torch": 1.7881393432617188e-05,
+  "top1_agreement_vs_torch": 1.0,
+  "max_abs_logit_diff_int8_vs_fp32": 0.0,
+  "top1_agreement_int8_vs_fp32": 1.0,
+  "ort_version": "1.32.0"
+ },
+ "model": {
+  "val": {
+   "n": 976,
+   "accuracy": 0.9047131147540983,
+   "macro_f1": 0.9052625188551194,
+   "coverage_at_threshold": 0.8657786885245902,
+   "accuracy_at_threshold": 0.9502958579881656,
+   "ci95": {
+    "accuracy": [
+     0.8872694672131147,
+     0.923155737704918
+    ],
+    "macro_f1": [
+     0.8857767490525753,
+     0.922779476298633
+    ],
+    "coverage_at_threshold": [
+     0.8442622950819673,
+     0.8862704918032787
+    ],
+    "accuracy_at_threshold": [
+     0.9348321906641256,
+     0.9648300117233294
+    ]
+   },
+   "ece": 0.021968439022903546,
+   "nll": 0.3403492867946625,
+   "per_class": {
+    "wireworm": {
+     "precision": 0.8260869565217391,
+     "recall": 0.9344262295081968,
+     "f1": 0.8769230769230769,
+     "support": 61
+    },
+    "click_beetle": {
+     "precision": 0.8782608695652174,
+     "recall": 0.9711538461538461,
+     "f1": 0.9223744292237444,
+     "support": 104
+    },
+    "corn_rootworm": {
+     "precision": 0.967479674796748,
+     "recall": 0.9916666666666667,
+     "f1": 0.9794238683127573,
+     "support": 120
+    },
+    "white_grub": {
+     "precision": 0.926605504587156,
+     "recall": 0.8859649122807017,
+     "f1": 0.9058295964125561,
+     "support": 114
+    },
+    "ground_beetle": {
+     "precision": 0.9378531073446328,
+     "recall": 0.9325842696629213,
+     "f1": 0.9352112676056338,
+     "support": 178
+    },
+    "millipede": {
+     "precision": 0.9172413793103448,
+     "recall": 0.8986486486486487,
+     "f1": 0.9078498293515358,
+     "support": 148
+    },
+    "earthworm": {
+     "precision": 0.9052631578947369,
+     "recall": 0.9347826086956522,
+     "f1": 0.9197860962566845,
+     "support": 92
+    },
+    "other": {
+     "precision": 0.8391608391608392,
+     "recall": 0.7547169811320755,
+     "f1": 0.794701986754967,
+     "support": 159
+    }
+   },
+   "confusion_matrix": {
+    "labels": [
+     "wireworm",
+     "click_beetle",
+     "corn_rootworm",
+     "white_grub",
+     "ground_beetle",
+     "millipede",
+     "earthworm",
+     "other"
+    ],
+    "rows_true_cols_pred": [
+     [
+      57,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      3
+     ],
+     [
+      0,
+      101,
+      0,
+      0,
+      2,
+      0,
+      0,
+      1
+     ],
+     [
+      0,
+      0,
+      119,
+      0,
+      1,
+      0,
+      0,
+      0
+     ],
+     [
+      0,
+      1,
+      0,
+      101,
+      1,
+      2,
+      1,
+      8
+     ],
+     [
+      0,
+      7,
+      3,
+      1,
+      166,
+      0,
+      0,
+      1
+     ],
+     [
+      0,
+      1,
+      0,
+      0,
+      2,
+      133,
+      5,
+      7
+     ],
+     [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      86,
+      3
+     ],
+     [
+      12,
+      4,
+      1,
+      5,
+      5,
+      9,
+      3,
+      120
+     ]
+    ]
+   }
+  },
+  "test": {
+   "n": 756,
+   "accuracy": 0.8611111111111112,
+   "macro_f1": 0.8719517475894722,
+   "coverage_at_threshold": 0.8108465608465608,
+   "accuracy_at_threshold": 0.9396411092985318,
+   "ci95": {
+    "accuracy": [
+     0.8359788359788359,
+     0.8862433862433863
+    ],
+    "macro_f1": [
+     0.8478100932044332,
+     0.8949610383265542
+    ],
+    "coverage_at_threshold": [
+     0.7830357142857143,
+     0.8386243386243386
+    ],
+    "accuracy_at_threshold": [
+     0.9206611570247933,
+     0.9580662043530206
+    ]
+   },
+   "ece": 0.02390431171214138,
+   "nll": 0.43158280849456787,
+   "per_class": {
+    "wireworm": {
+     "precision": 0.7833333333333333,
+     "recall": 0.8545454545454545,
+     "f1": 0.817391304347826,
+     "support": 55
+    },
+    "click_beetle": {
+     "precision": 0.7941176470588235,
+     "recall": 0.9310344827586207,
+     "f1": 0.8571428571428571,
+     "support": 87
+    },
+    "corn_rootworm": {
+     "precision": 0.9135802469135802,
+     "recall": 0.9367088607594937,
+     "f1": 0.9249999999999999,
+     "support": 79
+    },
+    "white_grub": {
+     "precision": 0.9583333333333334,
+     "recall": 0.9484536082474226,
+     "f1": 0.9533678756476685,
+     "support": 97
+    },
+    "ground_beetle": {
+     "precision": 0.7951807228915663,
+     "recall": 0.88,
+     "f1": 0.8354430379746836,
+     "support": 75
+    },
+    "millipede": {
+     "precision": 0.8933333333333333,
+     "recall": 0.881578947368421,
+     "f1": 0.8874172185430463,
+     "support": 76
+    },
+    "earthworm": {
+     "precision": 0.8901098901098901,
+     "recall": 0.9759036144578314,
+     "f1": 0.9310344827586207,
+     "support": 83
+    },
+    "other": {
+     "precision": 0.8511904761904762,
+     "recall": 0.7009803921568627,
+     "f1": 0.7688172043010754,
+     "support": 204
+    }
+   },
+   "confusion_matrix": {
+    "labels": [
+     "wireworm",
+     "click_beetle",
+     "corn_rootworm",
+     "white_grub",
+     "ground_beetle",
+     "millipede",
+     "earthworm",
+     "other"
+    ],
+    "rows_true_cols_pred": [
+     [
+      47,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      7
+     ],
+     [
+      0,
+      81,
+      0,
+      0,
+      2,
+      0,
+      0,
+      4
+     ],
+     [
+      0,
+      2,
+      74,
+      0,
+      0,
+      0,
+      0,
+      3
+     ],
+     [
+      0,
+      0,
+      0,
+      92,
+      1,
+      1,
+      0,
+      3
+     ],
+     [
+      0,
+      4,
+      3,
+      0,
+      66,
+      0,
+      0,
+      2
+     ],
+     [
+      0,
+      0,
+      1,
+      0,
+      0,
+      67,
+      2,
+      6
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      81,
+      0
+     ],
+     [
+      13,
+      15,
+      3,
+      4,
+      14,
+      5,
+      7,
+      143
+     ]
+    ]
+   }
+  },
+  "ood": {
+   "n": 488,
+   "accuracy": 0.7459016393442623,
+   "macro_f1": 0.7253625479433642,
+   "coverage_at_threshold": 0.7295081967213115,
+   "accuracy_at_threshold": 0.8623595505617978,
+   "ci95": {
+    "accuracy": [
+     0.7048668032786886,
+     0.7848360655737705
+    ],
+    "macro_f1": [
+     0.6745089813705434,
+     0.7674174517039496
+    ],
+    "coverage_at_threshold": [
+     0.6905737704918032,
+     0.7684426229508197
+    ],
+    "accuracy_at_threshold": [
+     0.8236951717103026,
+     0.8977303274682307
+    ]
+   },
+   "ece": 0.08633496120694231,
+   "nll": 0.9617592096328735,
+   "per_class": {
+    "wireworm": {
+     "precision": 0.46875,
+     "recall": 0.3409090909090909,
+     "f1": 0.39473684210526316,
+     "support": 44
+    },
+    "click_beetle": {
+     "precision": 0.7227722772277227,
+     "recall": 0.8795180722891566,
+     "f1": 0.7934782608695651,
+     "support": 83
+    },
+    "corn_rootworm": {
+     "precision": 0.9104477611940298,
+     "recall": 0.7176470588235294,
+     "f1": 0.8026315789473685,
+     "support": 85
+    },
+    "white_grub": {
+     "precision": 0.8533333333333334,
+     "recall": 0.810126582278481,
+     "f1": 0.8311688311688312,
+     "support": 79
+    },
+    "ground_beetle": {
+     "precision": 0.8958333333333334,
+     "recall": 0.7962962962962963,
+     "f1": 0.8431372549019608,
+     "support": 54
+    },
+    "millipede": {
+     "precision": 0.5714285714285714,
+     "recall": 0.8421052631578947,
+     "f1": 0.6808510638297872,
+     "support": 19
+    },
+    "earthworm": {
+     "precision": 0.6470588235294118,
+     "recall": 0.9166666666666666,
+     "f1": 0.7586206896551724,
+     "support": 12
+    },
+    "other": {
+     "precision": 0.675,
+     "recall": 0.7232142857142857,
+     "f1": 0.6982758620689654,
+     "support": 112
+    }
+   },
+   "confusion_matrix": {
+    "labels": [
+     "wireworm",
+     "click_beetle",
+     "corn_rootworm",
+     "white_grub",
+     "ground_beetle",
+     "millipede",
+     "earthworm",
+     "other"
+    ],
+    "rows_true_cols_pred": [
+     [
+      15,
+      19,
+      1,
+      0,
+      1,
+      1,
+      1,
+      6
+     ],
+     [
+      0,
+      73,
+      3,
+      0,
+      2,
+      0,
+      0,
+      5
+     ],
+     [
+      3,
+      2,
+      61,
+      2,
+      1,
+      5,
+      1,
+      10
+     ],
+     [
+      3,
+      0,
+      1,
+      64,
+      0,
+      1,
+      1,
+      9
+     ],
+     [
+      0,
+      4,
+      0,
+      1,
+      43,
+      0,
+      0,
+      6
+     ],
+     [
+      0,
+      0,
+      1,
+      0,
+      0,
+      16,
+      0,
+      2
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      11,
+      1
+     ],
+     [
+      11,
+      3,
+      0,
+      8,
+      1,
+      5,
+      3,
+      81
+     ]
+    ]
+   }
+  },
+  "ood_subsets": {
+   "field_or_other": {
+    "n": 488,
+    "accuracy": 0.7459016393442623,
+    "macro_f1": 0.7253625479433642,
+    "coverage_at_threshold": 0.7295081967213115,
+    "accuracy_at_threshold": 0.8623595505617978,
+    "ci95": {
+     "accuracy": [
+      0.7048668032786886,
+      0.7848360655737705
+     ],
+     "macro_f1": [
+      0.6745089813705434,
+      0.7674174517039496
+     ],
+     "coverage_at_threshold": [
+      0.6905737704918032,
+      0.7684426229508197
+     ],
+     "accuracy_at_threshold": [
+      0.8236951717103026,
+      0.8977303274682307
+     ]
+    },
+    "ece": 0.08633496120694231,
+    "nll": 0.9617592096328735,
+    "per_class": {
+     "wireworm": {
+      "precision": 0.46875,
+      "recall": 0.3409090909090909,
+      "f1": 0.39473684210526316,
+      "support": 44
+     },
+     "click_beetle": {
+      "precision": 0.7227722772277227,
+      "recall": 0.8795180722891566,
+      "f1": 0.7934782608695651,
+      "support": 83
+     },
+     "corn_rootworm": {
+      "precision": 0.9104477611940298,
+      "recall": 0.7176470588235294,
+      "f1": 0.8026315789473685,
+      "support": 85
+     },
+     "white_grub": {
+      "precision": 0.8533333333333334,
+      "recall": 0.810126582278481,
+      "f1": 0.8311688311688312,
+      "support": 79
+     },
+     "ground_beetle": {
+      "precision": 0.8958333333333334,
+      "recall": 0.7962962962962963,
+      "f1": 0.8431372549019608,
+      "support": 54
+     },
+     "millipede": {
+      "precision": 0.5714285714285714,
+      "recall": 0.8421052631578947,
+      "f1": 0.6808510638297872,
+      "support": 19
+     },
+     "earthworm": {
+      "precision": 0.6470588235294118,
+      "recall": 0.9166666666666666,
+      "f1": 0.7586206896551724,
+      "support": 12
+     },
+     "other": {
+      "precision": 0.675,
+      "recall": 0.7232142857142857,
+      "f1": 0.6982758620689654,
+      "support": 112
+     }
+    },
+    "confusion_matrix": {
+     "labels": [
+      "wireworm",
+      "click_beetle",
+      "corn_rootworm",
+      "white_grub",
+      "ground_beetle",
+      "millipede",
+      "earthworm",
+      "other"
+     ],
+     "rows_true_cols_pred": [
+      [
+       15,
+       19,
+       1,
+       0,
+       1,
+       1,
+       1,
+       6
+      ],
+      [
+       0,
+       73,
+       3,
+       0,
+       2,
+       0,
+       0,
+       5
+      ],
+      [
+       3,
+       2,
+       61,
+       2,
+       1,
+       5,
+       1,
+       10
+      ],
+      [
+       3,
+       0,
+       1,
+       64,
+       0,
+       1,
+       1,
+       9
+      ],
+      [
+       0,
+       4,
+       0,
+       1,
+       43,
+       0,
+       0,
+       6
+      ],
+      [
+       0,
+       0,
+       1,
+       0,
+       0,
+       16,
+       0,
+       2
+      ],
+      [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       11,
+       1
+      ],
+      [
+       11,
+       3,
+       0,
+       8,
+       1,
+       5,
+       3,
+       81
+      ]
+     ]
+    }
+   }
+  }
+ },
+ "threshold_sweep": {
+  "0.9": {
+   "abstain_below": 0.0,
+   "target_met_on_val": true,
+   "val": {
+    "accuracy": 0.9047131147540983,
+    "macro_f1": 0.9052625188551194,
+    "coverage_at_threshold": 1.0,
+    "accuracy_at_threshold": 0.9047131147540983
+   },
+   "test": {
+    "accuracy": 0.8611111111111112,
+    "macro_f1": 0.8719517475894722,
+    "coverage_at_threshold": 1.0,
+    "accuracy_at_threshold": 0.8611111111111112
+   },
+   "ood": {
+    "accuracy": 0.7459016393442623,
+    "macro_f1": 0.7253625479433642,
+    "coverage_at_threshold": 1.0,
+    "accuracy_at_threshold": 0.7459016393442623
+   }
+  },
+  "0.95": {
+   "abstain_below": 0.738004207611084,
+   "target_met_on_val": true,
+   "val": {
+    "accuracy": 0.9047131147540983,
+    "macro_f1": 0.9052625188551194,
+    "coverage_at_threshold": 0.8657786885245902,
+    "accuracy_at_threshold": 0.9502958579881656
+   },
+   "test": {
+    "accuracy": 0.8611111111111112,
+    "macro_f1": 0.8719517475894722,
+    "coverage_at_threshold": 0.8108465608465608,
+    "accuracy_at_threshold": 0.9396411092985318
+   },
+   "ood": {
+    "accuracy": 0.7459016393442623,
+    "macro_f1": 0.7253625479433642,
+    "coverage_at_threshold": 0.7295081967213115,
+    "accuracy_at_threshold": 0.8623595505617978
+   }
+  },
+  "0.98": {
+   "abstain_below": 0.9820197224617004,
+   "target_met_on_val": true,
+   "val": {
+    "accuracy": 0.9047131147540983,
+    "macro_f1": 0.9052625188551194,
+    "coverage_at_threshold": 0.38934426229508196,
+    "accuracy_at_threshold": 0.9815789473684211
+   },
+   "test": {
+    "accuracy": 0.8611111111111112,
+    "macro_f1": 0.8719517475894722,
+    "coverage_at_threshold": 0.328042328042328,
+    "accuracy_at_threshold": 0.9879032258064516
+   },
+   "ood": {
+    "accuracy": 0.7459016393442623,
+    "macro_f1": 0.7253625479433642,
+    "coverage_at_threshold": 0.2807377049180328,
+    "accuracy_at_threshold": 0.9197080291970803
+   }
+  }
+ },
+ "clip_zero_shot": {
+  "ViT-B-32/laion2b_s34b_b79k": {
+   "temperature": 1.870310783579457,
+   "abstain_below": 0.8503487706184387,
+   "target_met_on_val": true,
+   "val": {
+    "n": 976,
+    "accuracy": 0.6465163934426229,
+    "macro_f1": 0.6304517162022836,
+    "coverage_at_threshold": 0.10758196721311475,
+    "accuracy_at_threshold": 0.9523809523809523,
+    "ci95": {
+     "accuracy": [
+      0.6168032786885246,
+      0.6762295081967213
+     ],
+     "macro_f1": [
+      0.6016162240614021,
+      0.6561461838636002
+     ],
+     "coverage_at_threshold": [
+      0.08811475409836066,
+      0.12807377049180327
+     ],
+     "accuracy_at_threshold": [
+      0.9081632653061225,
+      0.9901960784313726
+     ]
+    },
+    "ece": 0.05622097370443774,
+    "nll": 1.0721105337142944,
+    "per_class": {
+     "wireworm": {
+      "precision": 0.24719101123595505,
+      "recall": 0.7213114754098361,
+      "f1": 0.36820083682008364,
+      "support": 61
+     },
+     "click_beetle": {
+      "precision": 0.6323529411764706,
+      "recall": 0.8269230769230769,
+      "f1": 0.7166666666666666,
+      "support": 104
+     },
+     "corn_rootworm": {
+      "precision": 0.8740157480314961,
+      "recall": 0.925,
+      "f1": 0.8987854251012146,
+      "support": 120
+     },
+     "white_grub": {
+      "precision": 0.6162790697674418,
+      "recall": 0.9298245614035088,
+      "f1": 0.7412587412587412,
+      "support": 114
+     },
+     "ground_beetle": {
+      "precision": 0.8881118881118881,
+      "recall": 0.7134831460674157,
+      "f1": 0.7912772585669781,
+      "support": 178
+     },
+     "millipede": {
+      "precision": 0.6698113207547169,
+      "recall": 0.4797297297297297,
+      "f1": 0.5590551181102362,
+      "support": 148
+     },
+     "earthworm": {
+      "precision": 0.7625,
+      "recall": 0.6630434782608695,
+      "f1": 0.7093023255813953,
+      "support": 92
+     },
+     "other": {
+      "precision": 0.7352941176470589,
+      "recall": 0.15723270440251572,
+      "f1": 0.25906735751295334,
+      "support": 159
+     }
+    },
+    "confusion_matrix": {
+     "labels": [
+      "wireworm",
+      "click_beetle",
+      "corn_rootworm",
+      "white_grub",
+      "ground_beetle",
+      "millipede",
+      "earthworm",
+      "other"
+     ],
+     "rows_true_cols_pred": [
+      [
+       44,
+       0,
+       0,
+       3,
+       0,
+       12,
+       1,
+       1
+      ],
+      [
+       1,
+       86,
+       6,
+       2,
+       9,
+       0,
+       0,
+       0
+      ],
+      [
+       1,
+       2,
+       111,
+       1,
+       2,
+       0,
+       0,
+       3
+      ],
+      [
+       3,
+       2,
+       0,
+       106,
+       1,
+       1,
+       0,
+       1
+      ],
+      [
+       1,
+       39,
+       5,
+       4,
+       127,
+       0,
+       0,
+       2
+      ],
+      [
+       43,
+       1,
+       0,
+       15,
+       0,
+       71,
+       17,
+       1
+      ],
+      [
+       22,
+       0,
+       0,
+       3,
+       0,
+       5,
+       61,
+       1
+      ],
+      [
+       63,
+       6,
+       5,
+       38,
+       4,
+       17,
+       1,
+       25
+      ]
+     ]
+    }
+   },
+   "test": {
+    "n": 756,
+    "accuracy": 0.5793650793650794,
+    "macro_f1": 0.5993019622358392,
+    "coverage_at_threshold": 0.07539682539682539,
+    "accuracy_at_threshold": 0.9473684210526315,
+    "ci95": {
+     "accuracy": [
+      0.5423280423280423,
+      0.6164021164021164
+     ],
+     "macro_f1": [
+      0.5646482691787452,
+      0.6311228333920048
+     ],
+     "coverage_at_threshold": [
+      0.056878306878306875,
+      0.09391534391534391
+     ],
+     "accuracy_at_threshold": [
+      0.8833333333333333,
+      1.0
+     ]
+    },
+    "ece": 0.0430137500088051,
+    "nll": 1.266948938369751,
+    "per_class": {
+     "wireworm": {
+      "precision": 0.3115942028985507,
+      "recall": 0.7818181818181819,
+      "f1": 0.4455958549222798,
+      "support": 55
+     },
+     "click_beetle": {
+      "precision": 0.638095238095238,
+      "recall": 0.7701149425287356,
+      "f1": 0.6979166666666666,
+      "support": 87
+     },
+     "corn_rootworm": {
+      "precision": 0.8292682926829268,
+      "recall": 0.8607594936708861,
+      "f1": 0.8447204968944099,
+      "support": 79
+     },
+     "white_grub": {
+      "precision": 0.489010989010989,
+      "recall": 0.9175257731958762,
+      "f1": 0.6379928315412187,
+      "support": 97
+     },
+     "ground_beetle": {
+      "precision": 0.6811594202898551,
+      "recall": 0.6266666666666667,
+      "f1": 0.6527777777777777,
+      "support": 75
+     },
+     "millipede": {
+      "precision": 0.5764705882352941,
+      "recall": 0.6447368421052632,
+      "f1": 0.6086956521739131,
+      "support": 76
+     },
+     "earthworm": {
+      "precision": 0.8627450980392157,
+      "recall": 0.5301204819277109,
+      "f1": 0.6567164179104479,
+      "support": 83
+     },
+     "other": {
+      "precision": 0.7045454545454546,
+      "recall": 0.15196078431372548,
+      "f1": 0.24999999999999997,
+      "support": 204
+     }
+    },
+    "confusion_matrix": {
+     "labels": [
+      "wireworm",
+      "click_beetle",
+      "corn_rootworm",
+      "white_grub",
+      "ground_beetle",
+      "millipede",
+      "earthworm",
+      "other"
+     ],
+     "rows_true_cols_pred": [
+      [
+       43,
+       0,
+       0,
+       7,
+       0,
+       5,
+       0,
+       0
+      ],
+      [
+       2,
+       67,
+       5,
+       3,
+       7,
+       0,
+       0,
+       3
+      ],
+      [
+       1,
+       2,
+       68,
+       2,
+       2,
+       0,
+       0,
+       4
+      ],
+      [
+       7,
+       0,
+       0,
+       89,
+       1,
+       0,
+       0,
+       0
+      ],
+      [
+       0,
+       21,
+       2,
+       3,
+       47,
+       0,
+       0,
+       2
+      ],
+      [
+       5,
+       1,
+       0,
+       11,
+       2,
+       49,
+       4,
+       4
+      ],
+      [
+       17,
+       0,
+       0,
+       16,
+       0,
+       6,
+       44,
+       0
+      ],
+      [
+       63,
+       14,
+       7,
+       51,
+       10,
+       25,
+       3,
+       31
+      ]
+     ]
+    }
+   },
+   "ood": {
+    "n": 488,
+    "accuracy": 0.5901639344262295,
+    "macro_f1": 0.5936444218546528,
+    "coverage_at_threshold": 0.06557377049180328,
+    "accuracy_at_threshold": 0.8125,
+    "ci95": {
+     "accuracy": [
+      0.5491290983606558,
+      0.6331967213114754
+     ],
+     "macro_f1": [
+      0.5425132311028613,
+      0.6376954326576397
+     ],
+     "coverage_at_threshold": [
+      0.045081967213114756,
+      0.08811475409836066
+     ],
+     "accuracy_at_threshold": [
+      0.6666666666666666,
+      0.9411764705882353
+     ]
+    },
+    "ece": 0.06644682668638034,
+    "nll": 1.3440821170806885,
+    "per_class": {
+     "wireworm": {
+      "precision": 0.2222222222222222,
+      "recall": 0.4090909090909091,
+      "f1": 0.28800000000000003,
+      "support": 44
+     },
+     "click_beetle": {
+      "precision": 0.6022727272727273,
+      "recall": 0.6385542168674698,
+      "f1": 0.6198830409356725,
+      "support": 83
+     },
+     "corn_rootworm": {
+      "precision": 0.8142857142857143,
+      "recall": 0.6705882352941176,
+      "f1": 0.7354838709677418,
+      "support": 85
+     },
+     "white_grub": {
+      "precision": 0.5483870967741935,
+      "recall": 0.8607594936708861,
+      "f1": 0.6699507389162561,
+      "support": 79
+     },
+     "ground_beetle": {
+      "precision": 0.75,
+      "recall": 0.7222222222222222,
+      "f1": 0.7358490566037735,
+      "support": 54
+     },
+     "millipede": {
+      "precision": 0.45454545454545453,
+      "recall": 0.5263157894736842,
+      "f1": 0.4878048780487805,
+      "support": 19
+     },
+     "earthworm": {
+      "precision": 0.7142857142857143,
+      "recall": 0.8333333333333334,
+      "f1": 0.7692307692307692,
+      "support": 12
+     },
+     "other": {
+      "precision": 0.8918918918918919,
+      "recall": 0.29464285714285715,
+      "f1": 0.4429530201342282,
+      "support": 112
+     }
+    },
+    "confusion_matrix": {
+     "labels": [
+      "wireworm",
+      "click_beetle",
+      "corn_rootworm",
+      "white_grub",
+      "ground_beetle",
+      "millipede",
+      "earthworm",
+      "other"
+     ],
+     "rows_true_cols_pred": [
+      [
+       18,
+       20,
+       1,
+       2,
+       0,
+       3,
+       0,
+       0
+      ],
+      [
+       5,
+       53,
+       7,
+       5,
+       11,
+       0,
+       1,
+       1
+      ],
+      [
+       5,
+       1,
+       57,
+       18,
+       2,
+       0,
+       0,
+       2
+      ],
+      [
+       8,
+       0,
+       1,
+       68,
+       0,
+       1,
+       0,
+       1
+      ],
+      [
+       0,
+       9,
+       3,
+       3,
+       39,
+       0,
+       0,
+       0
+      ],
+      [
+       5,
+       1,
+       0,
+       2,
+       0,
+       10,
+       1,
+       0
+      ],
+      [
+       2,
+       0,
+       0,
+       0,
+       0,
+       0,
+       10,
+       0
+      ],
+      [
+       38,
+       4,
+       1,
+       26,
+       0,
+       8,
+       2,
+       33
+      ]
+     ]
+    }
+   },
+   "ood_subsets": {
+    "field_or_other": {
+     "n": 488,
+     "accuracy": 0.5901639344262295,
+     "macro_f1": 0.5936444218546528,
+     "coverage_at_threshold": 0.06557377049180328,
+     "accuracy_at_threshold": 0.8125,
+     "ci95": {
+      "accuracy": [
+       0.5491290983606558,
+       0.6331967213114754
+      ],
+      "macro_f1": [
+       0.5425132311028613,
+       0.6376954326576397
+      ],
+      "coverage_at_threshold": [
+       0.045081967213114756,
+       0.08811475409836066
+      ],
+      "accuracy_at_threshold": [
+       0.6666666666666666,
+       0.9411764705882353
+      ]
+     },
+     "ece": 0.06644682668638034,
+     "nll": 1.3440821170806885,
+     "per_class": {
+      "wireworm": {
+       "precision": 0.2222222222222222,
+       "recall": 0.4090909090909091,
+       "f1": 0.28800000000000003,
+       "support": 44
+      },
+      "click_beetle": {
+       "precision": 0.6022727272727273,
+       "recall": 0.6385542168674698,
+       "f1": 0.6198830409356725,
+       "support": 83
+      },
+      "corn_rootworm": {
+       "precision": 0.8142857142857143,
+       "recall": 0.6705882352941176,
+       "f1": 0.7354838709677418,
+       "support": 85
+      },
+      "white_grub": {
+       "precision": 0.5483870967741935,
+       "recall": 0.8607594936708861,
+       "f1": 0.6699507389162561,
+       "support": 79
+      },
+      "ground_beetle": {
+       "precision": 0.75,
+       "recall": 0.7222222222222222,
+       "f1": 0.7358490566037735,
+       "support": 54
+      },
+      "millipede": {
+       "precision": 0.45454545454545453,
+       "recall": 0.5263157894736842,
+       "f1": 0.4878048780487805,
+       "support": 19
+      },
+      "earthworm": {
+       "precision": 0.7142857142857143,
+       "recall": 0.8333333333333334,
+       "f1": 0.7692307692307692,
+       "support": 12
+      },
+      "other": {
+       "precision": 0.8918918918918919,
+       "recall": 0.29464285714285715,
+       "f1": 0.4429530201342282,
+       "support": 112
+      }
+     },
+     "confusion_matrix": {
+      "labels": [
+       "wireworm",
+       "click_beetle",
+       "corn_rootworm",
+       "white_grub",
+       "ground_beetle",
+       "millipede",
+       "earthworm",
+       "other"
+      ],
+      "rows_true_cols_pred": [
+       [
+        18,
+        20,
+        1,
+        2,
+        0,
+        3,
+        0,
+        0
+       ],
+       [
+        5,
+        53,
+        7,
+        5,
+        11,
+        0,
+        1,
+        1
+       ],
+       [
+        5,
+        1,
+        57,
+        18,
+        2,
+        0,
+        0,
+        2
+       ],
+       [
+        8,
+        0,
+        1,
+        68,
+        0,
+        1,
+        0,
+        1
+       ],
+       [
+        0,
+        9,
+        3,
+        3,
+        39,
+        0,
+        0,
+        0
+       ],
+       [
+        5,
+        1,
+        0,
+        2,
+        0,
+        10,
+        1,
+        0
+       ],
+       [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        10,
+        0
+       ],
+       [
+        38,
+        4,
+        1,
+        26,
+        0,
+        8,
+        2,
+        33
+       ]
+      ]
+     }
+    }
+   }
+  }
+ },
+ "browser_check": {
+  "ort_web": "1.31.1",
+  "backend": "wasm",
+  "runtime": "Node v26, numThreads 1",
+  "inputs": "2 reference images, Python preprocessing",
+  "max_abs_diff": 6.735324859619141e-06,
+  "top1_match": true
+ },
+ "test_reads": 3
+}

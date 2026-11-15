@@ -64,7 +64,7 @@ flowchart LR
     ENG[src/taupin/engine.py rules + sources] --> R[web/data/risk.json]
   end
   subgraph train["train/ (model/ outputs)"]
-    INAT[iNaturalist + GBIF images] --> M[model/taupin.onnx + labels.json + metrics.json]
+    INAT[iNaturalist, GBIF and Wikimedia Commons images] --> M[model/taupin.onnx + labels.json + metrics.json]
   end
   subgraph web["web/ (static, no build step)"]
     F --> SC[scene.js: three.js parcel]
@@ -96,7 +96,7 @@ From `model/metrics.json` (version `v1-effb0`, 8 classes, abstain below a top-1 
 |---|---|---|---|---|---|
 | Validation | 976 | 90.5 % | 0.905 | 86.6 % | 95.0 % |
 | Test (sealed) | 756 | 86.1 % | 0.872 | 81.1 % | 94.0 % |
-| Out-of-distribution (GBIF, non-iNaturalist) | 488 | 74.6 % | 0.725 | 73.0 % | 86.2 % |
+| Other sources (GBIF 369, Wikimedia Commons 119) | 488 | 74.6 % | 0.725 | 73.0 % | 86.2 % |
 
 The threshold was chosen on validation; the test split was not used for any choice. Details,
 class counts and the split method are in `model/MODEL_CARD.md`.
@@ -108,7 +108,7 @@ class counts and the split method are in `model/MODEL_CARD.md`.
 | NASADEM (SRTM reprocessed), 30 m | parcel terrain, low wet pocket (lowest 15 % of cells) | NASA open data |
 | HLS L30 T18TWR, 2025-08-12 | parcel colour and NDVI | NASA open data |
 | NASA POWER daily TSOIL1, 1995-2025 | trap and larvae dates | NASA open data |
-| iNaturalist and GBIF photos | classifier training and test | CC0, CC-BY or public domain, per image in `data/attribution.csv` |
+| iNaturalist, GBIF and Wikimedia Commons photos | classifier training and test | CC0, CC-BY or public domain, per image in `data/attribution.csv` |
 | RAP Grandes cultures, Agri-Réseau doc. 115269 | wireworm scouting thresholds | cited |
 | MAPAQ / RAP, Agri-Réseau doc. 118135 | corn rootworm rules | cited |
 | Saguez et al. 2017, doi:10.1093/ee/nvx116; Noronha et al. 2023, doi:10.1007/s11829-023-09982-9 | wireworm factors | cited |
@@ -135,6 +135,8 @@ Gallery photos (Wikimedia Commons):
 - A photo identification is triage, not a count. Levels change only with bait-trap counts, which
   the agronomist records. The model also errs: on the gallery it calls the ground beetle a click
   beetle.
+- On photos from sources outside the training set the model is weakest on wireworm larvae: it
+  names 15 of 44 correctly (recall 0.34, `model/metrics.json`). An unclear photo goes to the lab.
 - NASA POWER is a grid of about 50 km; a field can be a few days ahead of or behind the dates shown.
 - Not a NASA product. Uses NASA open data.
 
