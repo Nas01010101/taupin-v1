@@ -130,10 +130,10 @@ export function metricsHTML(m) {
   const rows = metricsRows(m);
   if (!rows.length) return 'No accuracy figures in model/metrics.json yet.';
   const f = v => (typeof v === 'number' ? `${(100 * v).toFixed(1)} %` : 'n/a');
-  return `<table class="metrics"><thead><tr><th scope="col">Split</th><th scope="col">Photos</th><th scope="col">Accuracy</th><th scope="col">Macro-F1</th>` +
+  return `<div class="table-wrap"><table class="metrics"><thead><tr><th scope="col">Split</th><th scope="col">Photos</th><th scope="col">Accuracy</th><th scope="col">Macro-F1</th>` +
     `<th scope="col">Answered</th><th scope="col">Accuracy when answered</th></tr></thead><tbody>${rows.map(r =>
       `<tr><th scope="row">${esc(r.split)}</th><td>${Number.isFinite(r.n) ? r.n : 'n/a'}</td><td>${f(r.accuracy)}</td><td>${typeof r.macro_f1 === 'number' ? r.macro_f1.toFixed(3) : 'n/a'}</td>` +
-      `<td>${f(r.coverage_at_threshold)}</td><td>${f(r.accuracy_at_threshold)}</td></tr>`).join('')}</tbody></table>` +
+      `<td>${f(r.coverage_at_threshold)}</td><td>${f(r.accuracy_at_threshold)}</td></tr>`).join('')}</tbody></table></div>` +
     `<p class="muted small">From model/metrics.json${m.version ? ` (${esc(m.version)})` : ''}. "Answered" is the share of photos above the abstain threshold.</p>`;
 }
 

@@ -83,7 +83,7 @@ export function trapsGeoJSON(field, sheet) {
 }
 
 // Plain text the farmer hands to the agronomist. Every line is a value shown in the app.
-export function recordText({ date, field, window: tw, sheet, rank, photos = [] }) {
+export function recordText({ date, field, window: tw, sheet, rank, photos = [], own = null }) {
   const r = field.trap_rules, s = liftSummary(field.traps, sheet), side = field.parcel.size * field.parcel.res_m;
   const pad = (v, n) => String(v).padEnd(n);
   const rows = field.traps.map(t => `  ${pad(t.id, 5)}${pad(t.zone, 5)}${pad(t.lat.toFixed(6), 11)}${pad(t.lon.toFixed(6), 12)}`
@@ -95,7 +95,8 @@ export function recordText({ date, field, window: tw, sheet, rank, photos = [] }
     `  ${field.site.name}: a ${side} m square at ${field.site.lat} N, ${Math.abs(field.site.lon)} W`,
     ...(field.open ? [`  Open ground where traps can go: ${field.open.area_ha} ha`] : []), '',
     'When to trap',
-    `  Soil at 0 to 10 cm holds 12 °C for a week around ${tw.mean12} (NASA POWER TSOIL1, ${tw.span[0]} to ${tw.span[1]}); ${tw.last12} in ${tw.lastYear}`, '',
+    `  Soil at 0 to 10 cm holds 12 °C for a week around ${tw.mean12} (NASA POWER TSOIL1, ${tw.span[0]} to ${tw.span[1]}); ${tw.last12} in ${tw.lastYear}`,
+    ...(own ? [`  This date and the ranking below are for ${own}, not for the square above.`] : []), '',
     `Bait traps (at least ${r.min_traps} per field, about ${r.spacing_m} m apart; ${r.source})`,
     `  ${pad('Trap', 5)}${pad('Zone', 5)}${pad('Latitude', 11)}${pad('Longitude', 12)}${Array.from({ length: LIFTS }, (_, i) => pad(`Lift ${i + 1}`, 7)).join('').trimEnd()}`,
     ...rows, ...lifts,

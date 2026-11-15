@@ -67,7 +67,8 @@ open complement, not a stronger predictor.
 | Photo classifier v2 (DINOv2-S, 8 classes, ONNX, 23 MB) | on `build` (v1 on `main`) | `model/metrics.json`, `model/MODEL_CARD.md` |
 | Field risk model fitted on Quebec bait-trap fields | on `build` | `risk/`, `risk/model/metrics.json`, `tests/test_risk.py` |
 | Launchers for macOS, Windows and Linux | on `main` | `run.command`, `run.bat`, `run.sh` |
-| Pitch deck | 7 slides, published as a web page | the link has to be set to public before submission |
+| Pitch deck | 7 slides, published as a web page | shared as "anyone with the link"; open it once in a private window before submission |
+| Trap dates and field ranking for any coordinates | on `build` | `web/js/power.js`, `web/test/power.test.mjs` |
 
 ## Data
 
@@ -167,7 +168,8 @@ Limits, stated as measured:
 | No test photos taken in Quebec fields; outside-set audit has one rater | open | field photos from trails on 15 November, labelled as staged where they are |
 | "Over 90 %" | two sources, same research group | Labrie et al. 2020: 92.6 % of corn fields under 1 wireworm per trap (84 fields, 2012 to 2016). CÉROM report PV-3.2-2015-002: the threshold was exceeded in 10 % of cases in the 2011 to 2015 surveys, and in 25 % of 163 sites chosen for higher risk in 2016. Cite both in the deck |
 | Deck slide 6 and its capture showed the previous photo model | done | rebuilt from `model/metrics.json`; the cover runs `web/js/scene.js` on the same layer files as the app |
-| "Use my field": any coordinates, live NASA POWER call | open | after the demo field works |
+| "Use my field": any coordinates, live NASA POWER call | done on `build` | `web/js/power.js` asks NASA POWER for TSOIL1 and GWETROOT at the entered coordinates and gives the trap date, the yearly dates and the field ranking; the two coordinates are the only thing sent. For the demo site the browser result equals the baked `soil.json` and `field_risk.json` (31 years of dates, 11 years of ranking inputs, 0 differences). The 3D field, the trap points and the rotation table stay the demo square |
+| 3D field and trap points for any field | open | needs lidar, HLS, Landsat and the soil map fetched per field; today they are baked for one square |
 | Route to the Quebec lab for unclear photos | done on `build` | an unclear photo shows the lab's steps: online form first, then images by email or samples by post, first answer in 24 to 48 h (MAPAQ Laboratoire d'expertise et de diagnostic en phytoprotection, quebec.ca). The farmer sends it; the app sends nothing |
 | French interface | open | the users are Quebec farmers |
 | One file listing every data source with licence and access date | done | `DATA_SOURCES.md` |
@@ -177,7 +179,7 @@ Limits, stated as measured:
 
 ## Submission checklist
 
-- [ ] Deck at 7 slides or fewer (done), public link, no login (open: share the page publicly)
+- [ ] Deck at 7 slides or fewer (done), public link, no login (shared as "anyone with the link"; check it in a private window)
 - [ ] Public repository with licence, README, run commands
 - [ ] References list covering NASA POWER, HLS, Landsat, HRDEM, IRDA, CanSIS, OpenStreetMap, Labrie et al. 2020, GBIF, Wikimedia Commons, VFF QC, RAP and MAPAQ documents
 - [ ] All text in English

@@ -82,6 +82,8 @@ test('the record lists the traps, the count, the sources and who decides', () =>
   assert.match(txt, /The agronomist signs\./);
   assert.doesNotMatch(txt, /undefined|NaN|null/);
   assert.match(recordText({ date: 'd', field, window: trapWindow(soil), sheet: { counts: {} }, rank: null }), /Not available for this year/);
+  assert.doesNotMatch(txt, /not for the square above/);
+  assert.match(recordText({ date: 'd', field, window: trapWindow(soil), sheet: { counts: {} }, rank: null, own: '45.62 N, 72.95 W' }), /are for 45\.62 N, 72\.95 W, not for the square above/);
 });
 
 test('thresholds cover the four genera of the trap method', () => {

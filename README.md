@@ -27,6 +27,11 @@ Built for NASA Space Apps 2026. Taupin is French for wireworm and click beetle.
 - **Which fields first.** A model fitted on 82 Quebec bait-trapped fields ranks a field in the low,
   middle or high third for a year, from two field-form answers and two NASA POWER values. The
   output is a rank, not a probability.
+- **Your own field.** Enter a latitude and longitude, or use the device's position. The page asks
+  NASA POWER for soil temperature and root-zone wetness at that point and shows the trap date, the
+  date for each year since 1995 and the field's rank. Only the two coordinates leave the device,
+  and the answer is kept for use without a network. The 3D field, the trap points and the rotation
+  table stay the demo square.
 - **Count.** A sheet for three lifts per trap. Each lift is compared on its own with the threshold
   of the dominant species (3 per trap for *Hypnoidus abbreviatus*, 1 for *Agriotes*, *Limonius*
   and *Melanotus*; RAP Grandes cultures, Agri-Réseau doc. 115269).

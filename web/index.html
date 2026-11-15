@@ -7,7 +7,7 @@
 <meta name="description" content="Identify a soil insect from a photo, see when to set bait traps from NASA POWER soil temperature, and read the wireworm and corn rootworm risk for three rotations.">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#15160f">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-wkIUCUJPDZDnCpTEaHsG3Is67Qva9sI5aoU4Ek8Vzx4='; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-wkIUCUJPDZDnCpTEaHsG3Is67Qva9sI5aoU4Ek8Vzx4='; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: blob: https://power.larc.nasa.gov; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -71,9 +71,24 @@
       <div id="evidence"></div>
     </section>
 
+    <section id="sec-own" aria-labelledby="h-own">
+      <h2 id="h-own">Get the dates for your own field</h2>
+      <p class="lede">Enter the field's coordinates. The page sends these two numbers to NASA POWER (power.larc.nasa.gov) and nothing else, then keeps the answer on this device for use without a network.</p>
+      <form id="own" class="rank-form" novalidate>
+        <label class="small">Latitude <input id="own-lat" inputmode="decimal" autocomplete="off" placeholder="45.5013"></label>
+        <label class="small">Longitude <input id="own-lon" inputmode="decimal" autocomplete="off" placeholder="-73.7651"></label>
+        <div class="own-btn">
+          <button type="submit" class="ghost">Get NASA dates</button>
+          <button type="button" class="ghost" id="own-here">Use this device's position</button>
+          <button type="button" class="ghost" id="own-reset" hidden>Back to the demo field</button>
+        </div>
+      </form>
+      <p id="own-status" class="small" aria-live="polite"></p>
+    </section>
+
     <section id="sec-trap" aria-labelledby="h-trap">
       <h2 id="h-trap">When to set bait traps</h2>
-      <p class="lede">The week the top 10 cm of soil reaches 12 °C. NASA POWER, mean of 1995-2025.</p>
+      <p class="lede" id="trap-lede"></p>
       <div id="trap"></div>
     </section>
 
@@ -83,6 +98,7 @@
       <div class="rank-form">
         <label class="small">Scouting year <select id="rank-year"></select></label>
         <label class="small">Years in forage before this crop <input id="rank-forage" type="number" min="0" max="20" step="1" value="0" inputmode="numeric"></label>
+        <label class="small check" id="rank-light-wrap" hidden><input id="rank-light" type="checkbox"> Sand or sandy loam</label>
       </div>
       <div id="rank" aria-live="polite"></div>
       <p class="small">Field-level risk for the prescription: check <a href="https://cerom.qc.ca/vffqc/" rel="noopener" target="_blank">VFF QC</a> (CÉROM and MAPAQ), the tool agronomists use. This ranking orders the field against the training fields. It gives one rank for the whole field; the scouting zones on the map spread the traps and do not rank parts of the field.</p>

@@ -6,6 +6,7 @@ import { VIEWS } from './layers.js';
 import { loadModel, classifyPixels } from './model.js';
 import { effectFor, riskView, trapWindow } from './risk.js';
 import { fieldRanking } from './fieldrisk.js';
+import { parseCoords, coordText, fetchField } from './power.js';
 import { formatAnswer } from './classify.js';
 import * as scout from './scout.js';
 import * as ui from './ui.js';
@@ -25,11 +26,15 @@ function loadSheet() {
   return { counts: saved.counts ?? {}, dates: saved.dates ?? [], genus: saved.genus in scout.THRESHOLDS ? saved.genus : null };
 }
 const sheet = loadSheet();
+const DEMO_RUN = new URLSearchParams(location.search).has('demo');   // the recorded demo always uses the baked field
 const today = () => new Date().toLocaleDateString('en-CA');   // YYYY-MM-DD in local time
 
+// The demo square has no light soil; for another field the farmer ticks the box.
+const rankNow = () => fieldRanking(D.model, D.fieldRisk, { year: state.rankYear, forageYears: state.forage, lightSoil: state.own && state.light ? 1 : 0 });
+
 function recordNow() {
-  const r = fieldRanking(D.model, D.fieldRisk, { year: state.rankYear, forageYears: state.forage, lightSoil: 0 });
-  return scout.recordText({ date: today(), field: D.field, window: trapWindow(D.soil), sheet,
+  const r = rankNow();
+  return scout.recordText({ date: today(), field: D.field, window: trapWindow(D.soil), sheet, own: state.own && coordText(state.own),
     rank: r && { text: ui.RANK_TEXT[r.rank], year: r.year, n: D.model.metrics.n },
     photos: state.evidence.map(e => `${formatAnswer(e.decision)}, ${e.zoneLabel}`) });
 }
@@ -67,10 +72,42 @@ function renderModelStatus() {
 // nor sandy loam, so the model's light-soil input is 0 everywhere here.
 const LIGHT_SOIL_NOTE = 'Soil map units in this parcel are clay loam and muck, so the sand or sandy loam input is no everywhere and the rank is the same across the parcel.';
 
+const OWN_SOIL_NOTE = 'The app has no soil map for this place: tick the box if the field is sand or sandy loam.';
+const OWN_KEY = 'taupin-own';
+
+// Swap the baked dates and ranking inputs for another field's (or back, with null) and redraw.
+function useField(own, note = '') {
+  state.own = own && own.site;
+  D.soil = own ? own.soil : D.demo.soil; D.fieldRisk = own ? own.fr : D.demo.fieldRisk;
+  const years = Object.keys(D.fieldRisk.per_year).sort();
+  state.rankYear = years[years.length - 1];
+  $('#rank-year').innerHTML = years.map(y => `<option${y === state.rankYear ? ' selected' : ''}>${ui.esc(y)}</option>`).join('');
+  $('#own-reset').hidden = $('#rank-light-wrap').hidden = !own;
+  $('#own-status').textContent = note || (own
+    ? `Showing ${coordText(own.site)}, fetched ${own.fetched}. NASA POWER is modelled on a grid of about 50 km, so neighbouring fields get the same values. `
+      + (own.soil.always_warm ? 'The soil here is already at 12 °C on 1 March, so the date rule, written for Quebec springs, says nothing useful. ' : '')
+      + 'The 3D field, the trap points and the rotation table are still the demo square.'
+    : `Showing the demo field, ${D.field.site.name}.`);
+  renderPanel(); renderRank();
+}
+
+async function loadOwn(site) {
+  if (!site) { $('#own-status').textContent = 'Enter a latitude from -90 to 90 and a longitude from -180 to 180, as decimal degrees (west is negative).'; return; }
+  $('#own-lat').value = site.lat; $('#own-lon').value = site.lon;
+  $('#own-status').textContent = 'Asking NASA POWER…';
+  try {
+    const own = { ...await fetchField(site, D.demo), fetched: today() };
+    try { localStorage.setItem(OWN_KEY, JSON.stringify(own)); } catch { /* storage blocked: the field lasts for this visit */ }
+    useField(own);
+  } catch (e) {
+    $('#own-status').textContent = `No dates for ${coordText(site)}: ${e instanceof TypeError ? 'NASA POWER could not be reached' : e.message}. The page still shows ${state.own ? coordText(state.own) : 'the demo field'}.`;
+  }
+}
+
 function renderRank() {
-  const r = fieldRanking(D.model, D.fieldRisk, { year: state.rankYear, forageYears: state.forage, lightSoil: 0 });
+  const r = rankNow();
   $('#h-rank').textContent = r ? `${ui.RANK_TEXT[r.rank]} wireworm ranking for ${r.year}` : 'Field wireworm ranking';
-  $('#rank').innerHTML = ui.fieldRankHTML(r, D.model, { lightSoilNote: LIGHT_SOIL_NOTE });
+  $('#rank').innerHTML = ui.fieldRankHTML(r, D.model, { lightSoilNote: state.own ? OWN_SOIL_NOTE : LIGHT_SOIL_NOTE });
   $('#record').textContent = recordNow();
 }
 
@@ -83,6 +120,7 @@ function renderPanel() {
   $('#trace').innerHTML = ui.traceHTML(view, state.sel);
   const tw = trapWindow(D.soil);
   $('#h-trap').textContent = `Set bait traps around ${tw.mean12}`;
+  $('#trap-lede').textContent = `The week the top 10 cm of soil reaches 12 °C. NASA POWER, mean of ${tw.span[0]}-${tw.span[1]}${state.own ? ` at ${coordText(state.own)}` : ''}.`;
   $('#trap').innerHTML = ui.trapHTML(tw, D.soil, state.evidence);
   $('#evidence').innerHTML = ui.evidenceHTML(state.evidence);
   $('#result').innerHTML = ui.resultHTML(state.current);
@@ -173,6 +211,14 @@ function bind() {
     state.evidence.splice(Number(b.dataset.remove), 1); rebuildPins(); renderPanel();
   });
   $('#rank-year').addEventListener('change', e => { state.rankYear = e.target.value; renderRank(); });
+  $('#rank-light').addEventListener('change', e => { state.light = e.target.checked; renderRank(); });
+  $('#own').addEventListener('submit', e => { e.preventDefault(); loadOwn(parseCoords($('#own-lat').value, $('#own-lon').value)); });
+  $('#own-reset').addEventListener('click', () => { try { localStorage.removeItem(OWN_KEY); } catch { /* nothing stored */ } useField(null); });
+  $('#own-here').addEventListener('click', () => {
+    if (!navigator.geolocation) { $('#own-status').textContent = 'This browser gives no position. Type the coordinates.'; return; }
+    navigator.geolocation.getCurrentPosition(p => loadOwn(parseCoords(p.coords.latitude.toFixed(4), p.coords.longitude.toFixed(4))),
+      () => { $('#own-status').textContent = 'The position was refused or not available. Type the coordinates.'; });
+  });
   $('#rank-forage').addEventListener('input', e => {
     const v = Number(e.target.value);
     state.forage = Number.isFinite(v) ? Math.min(20, Math.max(0, v)) : 0; renderRank();
@@ -215,10 +261,7 @@ function showLayer(key) {
 async function main() {
   const [field, risk, soil, gallery, model, fieldRisk] = await Promise.all(['data/field.json', 'data/risk.json', 'data/soil.json',
     'data/gallery.json', 'data/risk_model.json', 'data/field_risk.json'].map(getJSON));
-  D = { field, risk, soil, gallery: gallery.items, metrics: null, model, fieldRisk };
-  const years = Object.keys(fieldRisk.per_year).sort();
-  state.rankYear = years[years.length - 1];
-  $('#rank-year').innerHTML = years.map(y => `<option${y === state.rankYear ? ' selected' : ''}>${ui.esc(y)}</option>`).join('');
+  D = { field, risk, soil, gallery: gallery.items, metrics: null, model, fieldRisk, demo: { soil, fieldRisk } };
   scene = createScene($('#field'), field, 'data/');
   $('#layer').innerHTML = VIEWS.map(v => `<button type="button" class="seg" data-view="${ui.esc(v.key)}" aria-pressed="${v.key === 'terrain'}">${ui.esc(v.label)}</button>`).join('');
   showLayer('terrain');
@@ -230,8 +273,11 @@ async function main() {
   $('#field-src').innerHTML = Object.values(field.sources).map(s => `<li>${ui.esc(s)}</li>`).join('');
   $('#gallery').innerHTML = ui.galleryHTML(D.gallery, null);
   bind();
-  renderPanel();
-  renderRank();
+  // A field fetched earlier comes back from this device's storage, so it also opens with no network.
+  let own = null;
+  if (!DEMO_RUN) try { own = JSON.parse(localStorage.getItem(OWN_KEY)); } catch { /* blocked or bad JSON: demo field */ }
+  if (own?.site) { $('#own-lat').value = own.site.lat; $('#own-lon').value = own.site.lon; }
+  useField(own?.soil && own?.fr ? own : null);
   renderCounts();
   renderModelStatus();
   // Absolute: ort resolves wasmPaths against its own module URL, not the page.
@@ -244,7 +290,7 @@ async function main() {
   else if (state.model.status !== 'ready') state.current = { kind: 'missing' };
   renderModelStatus();
   renderPanel();
-  if (new URLSearchParams(location.search).has('demo')) (await import('./demo.js')).runDemo({ scene, state, D, ingest, renderPanel });
+  if (DEMO_RUN) (await import('./demo.js')).runDemo({ scene, state, D, ingest, renderPanel });
   else window.taupinReady = true;
 }
 
